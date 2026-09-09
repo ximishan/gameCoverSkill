@@ -1,17 +1,26 @@
 #!/usr/bin/env python3
 import argparse
-import os
 from pathlib import Path
 from typing import List, Tuple
 
-from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageEnhance, ImageFont
+
+SIZE_PRESETS = {
+    "feed-4x5": (1080, 1350),
+    "portrait-3x4": (1080, 1440),
+    "vertical-9x16": (1080, 1920),
+    "square-1x1": (1080, 1080),
+    "landscape-16x9": (1920, 1080),
+    "landscape-16x10": (1600, 1000),
+}
 
 RATIOS = {
-    "4:5": (1080, 1350),
-    "3:4": (1080, 1440),
-    "9:16": (1080, 1920),
-    "1:1": (1080, 1080),
-    "16:9": (1920, 1080),
+    "4:5": SIZE_PRESETS["feed-4x5"],
+    "3:4": SIZE_PRESETS["portrait-3x4"],
+    "9:16": SIZE_PRESETS["vertical-9x16"],
+    "1:1": SIZE_PRESETS["square-1x1"],
+    "16:9": SIZE_PRESETS["landscape-16x9"],
+    "16:10": SIZE_PRESETS["landscape-16x10"],
 }
 
 FONT_CANDIDATES = [
@@ -27,9 +36,10 @@ FONT_CANDIDATES = [
 ]
 
 WHITE = (255, 255, 255, 255)
-YELLOW = (255, 214, 0, 255)
+YELLOW = (255, 218, 0, 255)
 BLACK = (0, 0, 0, 255)
-TAG_BG = (0, 0, 0, 185)
+RED = (220, 20, 24, 235)
+DARK = (0, 0, 0, 205)
 
 
 def find_font(explicit: str | None) -> str:
@@ -45,6 +55,30 @@ def find_font(explicit: str | None) -> str:
         "No Chinese font found automatically. Pass --font with a local Chinese bold font path, "
         "for example C:\\Windows\\Fonts\\msyhbd.ttc"
     )
+
+
+def parse_size(value: str) -> Tuple[int, int]:
+    raw = value.lower().replace("×", "x").strip()
+    if "x" not in raw:
+        raise argparse.ArgumentTypeError("Size must look like 1080x1350")
+    w, h = raw.split("x", 1)
+    try:
+        width, height = int(w), int(h)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("Size must contain integer pixels") from exc
+    if width < 320 or height < 320:
+        raise argparse.ArgumentTypeError("Width and height must both be at least 320 px")
+    return width, height
+
+
+def resolve_size(size, preset, ratio):
+    if size:
+        return size
+    if preset:
+        return SIZE_PRESETS[preset]
+    if ratio:
+        return RATIOS[ratio]
+    return SIZE_PRESETS["feed-4x5"]
 
 
 def cover_crop(img: Image.Image, size: Tuple[int, int]) -> Image.Image:
@@ -66,145 +100,165 @@ def split_text(text: str, max_chars: int = 8) -> List[str]:
         return [x.strip() for x in text.splitlines() if x.strip()]
     if len(text) <= max_chars:
         return [text]
-    lines = []
-    remaining = text
-    while remaining:
-        if len(remaining) <= max_chars:
-            lines.append(remaining)
-            break
-        # Try to split near max_chars on common separators.
-        cut = max_chars
-        for i in range(max_chars, max(2, max_chars - 3), -1):
-            if i < len(remaining) and remaining[i - 1] in " ·|/-—：:，,":
-                cut = i
-                break
-        lines.append(remaining[:cut].strip(" ·|/-—：:，,"))
-        remaining = remaining[cut:].strip(" ·|/-—：:，,")
-    return [x for x in lines if x]
+    result = []
+    while text:
+        result.append(text[:max_chars].strip())
+        text = text[max_chars:].strip()
+    return result
 
 
-def fit_font(draw: ImageDraw.ImageDraw, lines: List[str], font_path: str,
-             max_width: int, start_size: int, min_size: int = 42, stroke: int = 8) -> ImageFont.FreeTypeFont:
+def fit_font(draw, lines, font_path, max_width, start_size, min_size, stroke):
     size = start_size
     while size >= min_size:
         font = ImageFont.truetype(font_path, size=size)
-        widest = 0
-        for line in lines or [" "]:
-            box = draw.textbbox((0, 0), line, font=font, stroke_width=stroke)
-            widest = max(widest, box[2] - box[0])
-        if widest <= max_width:
+        widths = [draw.textbbox((0, 0), line, font=font, stroke_width=stroke)[2] for line in (lines or [" "])]
+        if max(widths) <= max_width:
             return font
         size -= 4
     return ImageFont.truetype(font_path, size=min_size)
 
 
-def line_height(draw: ImageDraw.ImageDraw, font: ImageFont.FreeTypeFont, stroke: int) -> int:
-    box = draw.textbbox((0, 0), "国Ag", font=font, stroke_width=stroke)
-    return box[3] - box[1]
+def text_size(draw, text, font, stroke=0):
+    box = draw.textbbox((0, 0), text, font=font, stroke_width=stroke)
+    return box[2] - box[0], box[3] - box[1]
 
 
-def draw_centered_lines(draw: ImageDraw.ImageDraw, lines: List[str], center_x: int, y: int,
-                        font: ImageFont.FreeTypeFont, fill, stroke_width: int,
-                        spacing: int = 10) -> int:
-    h = line_height(draw, font, stroke_width)
-    for line in lines:
-        box = draw.textbbox((0, 0), line, font=font, stroke_width=stroke_width)
-        w = box[2] - box[0]
-        draw.text((center_x - w / 2, y), line, font=font, fill=fill,
-                  stroke_width=stroke_width, stroke_fill=BLACK)
-        y += h + spacing
-    return y
-
-
-def add_bottom_gradient(img: Image.Image, height_ratio: float = 0.52) -> Image.Image:
+def add_readability_layers(img: Image.Image) -> Image.Image:
     w, h = img.size
-    gh = int(h * height_ratio)
-    overlay = Image.new("RGBA", (w, gh), (0, 0, 0, 0))
+    overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     px = overlay.load()
-    for y in range(gh):
-        t = y / max(1, gh - 1)
-        alpha = int(12 + 170 * (t ** 1.7))
-        for x in range(w):
-            px[x, y] = (0, 0, 0, alpha)
-    img.alpha_composite(overlay, (0, h - gh))
+    for y in range(h):
+        top_t = max(0.0, 1.0 - y / max(1, h * 0.42))
+        bot_t = max(0.0, (y - h * 0.62) / max(1, h * 0.38))
+        alpha = int(min(170, 70 * top_t + 150 * (bot_t ** 1.5)))
+        if alpha:
+            for x in range(w):
+                px[x, y] = (0, 0, 0, alpha)
+    img.alpha_composite(overlay)
     return img
 
 
-def draw_tag(draw: ImageDraw.ImageDraw, text: str, font_path: str, canvas_w: int, canvas_h: int):
+def brush_points(x, y, width, height, notch):
+    return [
+        (x, y + notch), (x + notch, y),
+        (x + width - notch * 2, y + notch // 2),
+        (x + width, y + notch),
+        (x + width - notch, y + height),
+        (x + notch * 2, y + height - notch // 2),
+        (x, y + height - notch),
+    ]
+
+
+def draw_brush_panel(draw, rect, fill=RED):
+    x1, y1, x2, y2 = rect
+    width, height = x2 - x1, y2 - y1
+    notch = max(5, int(height * 0.16))
+    draw.polygon(brush_points(x1, y1, width, height, notch), fill=fill)
+
+
+def draw_tag(draw, text, font_path, w, h):
     if not text:
         return
-    size = max(34, int(canvas_w * 0.050))
+    size = max(30, int(min(w, h) * 0.045))
     font = ImageFont.truetype(font_path, size=size)
-    stroke = max(3, int(canvas_w * 0.003))
-    box = draw.textbbox((0, 0), text, font=font, stroke_width=stroke)
-    tw, th = box[2] - box[0], box[3] - box[1]
-    pad_x, pad_y = int(size * 0.38), int(size * 0.22)
-    x = int(canvas_w * 0.055)
-    y = int(canvas_h * 0.055)
-    rect = (x, y, x + tw + pad_x * 2, y + th + pad_y * 2)
-    radius = int(size * 0.26)
-    draw.rounded_rectangle(rect, radius=radius, fill=TAG_BG)
-    draw.text((x + pad_x, y + pad_y - 2), text, font=font, fill=WHITE,
+    stroke = max(3, int(size * 0.09))
+    tw, th = text_size(draw, text, font, stroke)
+    px, py = int(size * 0.40), int(size * 0.20)
+    x, y = int(w * 0.045), int(h * 0.035)
+    rect = (x, y, x + tw + px * 2, y + th + py * 2)
+    draw_brush_panel(draw, rect, RED)
+    draw.text((x + px, y + py - 2), text, font=font, fill=WHITE,
               stroke_width=stroke, stroke_fill=BLACK)
 
 
-def render(input_path: str, output_path: str, title: str, tag: str, accent: str,
-           ratio: str, position: str, font_path: str, darken: bool, gradient: bool):
-    if ratio not in RATIOS:
-        raise ValueError(f"Unsupported ratio {ratio}. Choose from: {', '.join(RATIOS)}")
-    size = RATIOS[ratio]
+def draw_title(draw, title, font_path, w, h):
+    lines = split_text(title, max_chars=7)
+    if not lines:
+        return int(h * 0.12)
+    stroke = max(7, int(w * 0.012))
+    font = fit_font(draw, lines, font_path, int(w * 0.92), int(w * 0.145), int(w * 0.072), stroke)
+    y = int(h * 0.085)
+    for line in lines:
+        tw, th = text_size(draw, line, font, stroke)
+        x = int((w - tw) / 2)
+        shadow = max(4, int(w * 0.006))
+        draw.text((x + shadow, y + shadow), line, font=font, fill=RED,
+                  stroke_width=stroke, stroke_fill=BLACK)
+        draw.text((x, y), line, font=font, fill=WHITE,
+                  stroke_width=stroke, stroke_fill=BLACK)
+        y += th + int(h * 0.010)
+    return y
+
+
+def draw_features(draw, features, version, font_path, w, h, start_y):
+    y = max(start_y, int(h * 0.30))
+    x = int(w * 0.045)
+    max_panel_w = int(w * 0.72)
+    base_size = max(34, int(w * 0.066))
+    stroke = max(4, int(w * 0.006))
+
+    for idx, feature in enumerate(features[:3]):
+        lines = split_text(feature, max_chars=10)
+        font = fit_font(draw, lines, font_path, max_panel_w, base_size, int(w * 0.046), stroke)
+        for line in lines:
+            tw, th = text_size(draw, line, font, stroke)
+            px, py = int(font.size * 0.34), int(font.size * 0.18)
+            panel_w = min(max_panel_w, tw + px * 2)
+            rect = (x, y, x + panel_w, y + th + py * 2)
+            draw_brush_panel(draw, rect, DARK)
+            fill = YELLOW if idx % 2 == 0 else WHITE
+            draw.text((x + px, y + py - 2), line, font=font, fill=fill,
+                      stroke_width=stroke, stroke_fill=BLACK)
+            y = rect[3] + int(h * 0.012)
+
+    if version:
+        text = version if version.startswith("版本") else f"版本号 {version}"
+        font = ImageFont.truetype(font_path, size=max(28, int(w * 0.048)))
+        tw, th = text_size(draw, text, font, stroke)
+        px, py = int(font.size * 0.30), int(font.size * 0.16)
+        rect = (x, y, min(w - int(w * 0.045), x + tw + px * 2), y + th + py * 2)
+        draw_brush_panel(draw, rect, RED)
+        draw.text((x + px, y + py - 2), text, font=font, fill=WHITE,
+                  stroke_width=stroke, stroke_fill=BLACK)
+
+
+def draw_bottom_accent(draw, text, font_path, w, h):
+    if not text:
+        return
+    lines = split_text(text, max_chars=7)
+    stroke = max(8, int(w * 0.013))
+    font = fit_font(draw, lines, font_path, int(w * 0.92), int(w * 0.165), int(w * 0.080), stroke)
+    heights = [text_size(draw, line, font, stroke)[1] for line in lines]
+    total_h = sum(heights) + max(0, len(lines) - 1) * int(h * 0.008)
+    y = h - int(h * 0.050) - total_h
+    panel_top = max(int(h * 0.60), y - int(h * 0.025))
+    draw_brush_panel(draw, (int(w * 0.02), panel_top, int(w * 0.98), h - int(h * 0.025)), RED)
+    for line, th in zip(lines, heights):
+        tw, _ = text_size(draw, line, font, stroke)
+        x = int((w - tw) / 2)
+        draw.text((x, y), line, font=font, fill=YELLOW,
+                  stroke_width=stroke, stroke_fill=BLACK)
+        y += th + int(h * 0.008)
+
+
+def render(input_path, output_path, title, tag, features, version, accent,
+           size, font_path, darken, readability):
     img = Image.open(input_path).convert("RGB")
     img = cover_crop(img, size)
-
     if darken:
-        img = ImageEnhance.Brightness(img).enhance(0.82)
-        img = ImageEnhance.Contrast(img).enhance(1.07)
+        img = ImageEnhance.Brightness(img).enhance(0.86)
+        img = ImageEnhance.Contrast(img).enhance(1.08)
         img = ImageEnhance.Color(img).enhance(1.08)
-
     img = img.convert("RGBA")
-    if gradient:
-        img = add_bottom_gradient(img)
+    if readability:
+        img = add_readability_layers(img)
 
     draw = ImageDraw.Draw(img)
     w, h = img.size
-    side_margin = int(w * 0.065)
-    max_width = w - 2 * side_margin
-    stroke = max(6, int(w * 0.0105))
-
     draw_tag(draw, tag, font_path, w, h)
-
-    title_lines = split_text(title, max_chars=8)
-    accent_lines = split_text(accent, max_chars=7)
-
-    title_font = fit_font(draw, title_lines, font_path, max_width,
-                          start_size=int(w * 0.105), min_size=int(w * 0.055), stroke=stroke)
-    accent_font = fit_font(draw, accent_lines, font_path, max_width,
-                           start_size=int(w * 0.135), min_size=int(w * 0.065), stroke=stroke)
-
-    title_h = line_height(draw, title_font, stroke)
-    accent_h = line_height(draw, accent_font, stroke)
-    title_block_h = len(title_lines) * title_h + max(0, len(title_lines)-1) * int(w*0.008)
-    accent_block_h = len(accent_lines) * accent_h + max(0, len(accent_lines)-1) * int(w*0.007)
-
-    if position == "bottom":
-        accent_y = h - int(h * 0.065) - accent_block_h
-        title_y = accent_y - int(h * 0.040) - title_block_h
-    elif position == "center":
-        total = title_block_h + accent_block_h + int(h * 0.045)
-        title_y = int(h * 0.54 - total / 2)
-        accent_y = title_y + title_block_h + int(h * 0.045)
-    elif position == "split":
-        title_y = int(h * 0.37)
-        accent_y = h - int(h * 0.08) - accent_block_h
-    else:
-        raise ValueError("position must be bottom, center, or split")
-
-    if title_lines:
-        draw_centered_lines(draw, title_lines, w // 2, title_y, title_font, WHITE, stroke,
-                            spacing=int(w * 0.008))
-    if accent_lines:
-        draw_centered_lines(draw, accent_lines, w // 2, accent_y, accent_font, YELLOW, stroke,
-                            spacing=int(w * 0.007))
+    title_end = draw_title(draw, title, font_path, w, h)
+    draw_features(draw, features, version, font_path, w, h, title_end + int(h * 0.02))
+    draw_bottom_accent(draw, accent, font_path, w, h)
 
     out = Path(output_path)
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -216,31 +270,31 @@ def render(input_path: str, output_path: str, title: str, tag: str, accent: str,
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Render a bold Chinese game-sharing cover from an existing image.")
-    ap.add_argument("input", help="Input screenshot/key art image")
+    ap = argparse.ArgumentParser(description="Render a high-attention Chinese game-sharing cover with exact text.")
+    ap.add_argument("input", help="Input screenshot, key art, poster, or generated background")
     ap.add_argument("--output", "-o", default="game-cover.png")
-    ap.add_argument("--title", required=True, help="Game title or main hook")
-    ap.add_argument("--tag", default="游戏分享", help="Small top tag")
-    ap.add_argument("--accent", default="手游分享", help="Large yellow emphasis text")
-    ap.add_argument("--ratio", choices=RATIOS.keys(), default="4:5")
-    ap.add_argument("--position", choices=["bottom", "center", "split"], default="bottom")
+    ap.add_argument("--title", required=True, help="Game title")
+    ap.add_argument("--tag", default="游戏分享", help="Top tag, e.g. Steam移植游戏")
+    ap.add_argument("--feature", action="append", default=[], help="Selling point; repeat up to three times")
+    ap.add_argument("--version", default="", help="Version number, e.g. 1.0.78")
+    ap.add_argument("--accent", default="手游分享", help="Large bottom emphasis, e.g. PC+安卓")
+    ap.add_argument("--preset", choices=SIZE_PRESETS.keys(), default=None,
+                    help="Output-size preset; default feed-4x5")
+    ap.add_argument("--ratio", choices=RATIOS.keys(), default=None,
+                    help="Backward-compatible ratio alias")
+    ap.add_argument("--size", type=parse_size, default=None,
+                    help="Custom exact size, e.g. 1242x1660; overrides preset/ratio")
     ap.add_argument("--font", default=None, help="Explicit Chinese TTF/TTC/OTF font path")
     ap.add_argument("--no-darken", action="store_true")
-    ap.add_argument("--no-gradient", action="store_true")
+    ap.add_argument("--no-readability-layer", action="store_true")
     args = ap.parse_args()
 
+    size = resolve_size(args.size, args.preset, args.ratio)
     font_path = find_font(args.font)
     render(
-        input_path=args.input,
-        output_path=args.output,
-        title=args.title,
-        tag=args.tag,
-        accent=args.accent,
-        ratio=args.ratio,
-        position=args.position,
-        font_path=font_path,
-        darken=not args.no_darken,
-        gradient=not args.no_gradient,
+        args.input, args.output, args.title, args.tag, args.feature,
+        args.version, args.accent, size, font_path,
+        not args.no_darken, not args.no_readability_layer,
     )
 
 
