@@ -1,0 +1,109 @@
+# Genre Template Reference
+
+This file defines the visual families used by `game-cover-maker`. The goal is not merely to recolor one layout: different game types should feel like different cover systems while preserving the same high-readability information hierarchy.
+
+## Action — `action`
+
+Overlay: red/black impact theme, rough brush panels, huge white title, yellow CTA, aggressive contrast.
+
+Background prompt direction: dynamic hero mid-attack, debris/sparks, strong diagonal motion, hard rim light, dark environment, subject centered or lower-right, clean upper title zone.
+
+Best for: action games, fighting, soulslike, boss-rush.
+
+## Roguelike — `roguelike`
+
+Overlay: deeper crimson/black than action, rugged brush geometry, gold-yellow emphasis.
+
+Background: dungeon/castle/underworld mood, dangerous enemies, high-contrast magical/fire lighting, repeat-run/harsh-world feeling without literal text.
+
+Best for: Dead Cells-like, Hades-like, dungeon roguelikes.
+
+## Shooter — `shooter`
+
+Overlay: tactical orange/black, slanted panels, compact military-tech feel.
+
+Background: weapon/action subject, muzzle light or explosive highlights, smoke, battlefield/urban combat depth, motion lines; reserve upper/left text space.
+
+Best for: FPS/TPS, military shooters, run-and-gun.
+
+## RPG — `rpg`
+
+Overlay: navy/purple + gold, framed panels, epic/fantasy tone.
+
+Background: hero party, magic, grand city/castle/world vista, cinematic light, fewer chaotic foreground objects near text.
+
+Best for: JRPG, ARPG, fantasy adventure.
+
+## Strategy — `strategy`
+
+Overlay: dark navy + muted gold, framed/command-board geometry, controlled visual hierarchy.
+
+Background: battlefield overview, commanders, maps/cities/armies, strategic scale, more negative space than action templates.
+
+Best for: SLG, RTS, tower defense, civilization/empire games.
+
+## Casual — `casual`
+
+Overlay: bright sky blue/orange, rounded white/cream cards, softer dark stroke, clean spacing.
+
+Background: colorful friendly scene, simple shapes, large recognizable objects, daylight/soft studio lighting, uncluttered composition.
+
+Best for: puzzle, card, party, cozy, family games.
+
+## Horror — `horror`
+
+Overlay: black/blood-red, low-saturation, distressed brush blocks, red CTA instead of cheerful yellow dominance.
+
+Background: fog, abandoned interiors, silhouettes, narrow light source, ominous creature/figure, strong darkness around edges; avoid excessive gore.
+
+Best for: horror, thriller, zombie, dark survival horror.
+
+## Racing — `racing`
+
+Overlay: cyan/orange neon, slanted speed panels, strong diagonals.
+
+Background: car/bike in motion, road light trails, city/night track, wheel/vehicle angle creating forward motion, plenty of motion blur away from text.
+
+Best for: racing, drifting, vehicle action.
+
+## Simulation — `simulation`
+
+Overlay: teal/green, rounded clean panels, modern interface-like clarity without fake UI.
+
+Background: city/farm/shop/workspace/building scene, bright readable lighting, organized composition, realistic or polished stylized visuals.
+
+Best for: simulator, tycoon, management, city-builder.
+
+## Survival — `survival`
+
+Overlay: olive/brown/orange, rough rugged panels, worn outdoor feel.
+
+Background: wilderness/post-apocalypse, improvised gear, storm/fire/sunset, isolated character, resource-scarcity atmosphere.
+
+Best for: crafting, wilderness, apocalypse, extraction-survival.
+
+## Anime — `anime`
+
+Overlay: magenta/purple + cyan neon, rounded panels, high saturation, energetic but cleaner than action.
+
+Background: original anime-style hero group or single character, dramatic pose, neon/magical effects, clear face visibility, clean upper title zone.
+
+Best for: anime action, gacha, character collectors, stylized JRPG.
+
+## Retro — `retro`
+
+Overlay: purple/pink/cyan, pixel-block panel shapes, cream/white title.
+
+Background: pixel-art or retro-inspired scene, arcade lighting, limited-palette feel, simple readable silhouette.
+
+Best for: pixel games, retro ports, 8-bit/16-bit inspired titles.
+
+## General — `general`
+
+Overlay: classic red/black brush, white title, yellow CTA.
+
+Use only when a genre cannot be inferred reliably. It should remain a safe high-attention fallback, not the default for known game types.
+
+## Prompt safety rule
+
+When generating a new background, never request exact recreation of an official game cover. Describe the genre, mood, subject, composition, and lighting. Request no text/logos/watermarks. Final exact text is added by the renderer.
