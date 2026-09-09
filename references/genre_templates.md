@@ -38,9 +38,49 @@ Best for: JRPG, ARPG, fantasy adventure.
 
 Overlay: dark navy + muted gold, framed/command-board geometry, controlled visual hierarchy.
 
-Background: battlefield overview, commanders, maps/cities/armies, strategic scale, more negative space than action templates.
+Background: battlefield overview, commanders, tactical maps, cities, units, defensive lines, strategic scale, more negative space than action templates.
 
-Best for: SLG, RTS, tower defense, civilization/empire games.
+Best for: RTS, tower defense, conventional SLG, civilization-style strategy.
+
+Do **not** use this as the first choice for Paradox-style country/empire simulation when `grand-strategy` is more accurate.
+
+## Grand Strategy — `grand-strategy`
+
+Overlay: imperial navy, parchment gold, dark burgundy accents, ornate framed panels, premium historical/command-room feeling. The visual system should feel less like a mobile SLG ad and more like a large PC strategy title while retaining thumbnail readability.
+
+Background prompt direction:
+
+- large continental/world/galactic map as a major visual anchor
+- ruler, statesman, general, diplomat, court, parliament, or war-room subject
+- armies and fleets shown as part of a larger national-scale system, not just close-up combat
+- flags, borders, seals, compass, globe, parchment, treaties, trade routes, capital/city silhouettes
+- strong depth but controlled composition; avoid excessive explosion/fire effects
+- reserve a clean upper/center title zone and one side for feature cards
+- palette: deep navy / royal blue / parchment beige / antique gold; optional burgundy accent
+
+Best for:
+
+- `欧陆风云4` / Europa Universalis
+- `钢铁雄心4` / Hearts of Iron
+- `十字军之王3` / Crusader Kings
+- `维多利亚3` / Victoria
+- `群星` / Stellaris
+- other nation/realm/empire-scale systemic strategy games
+
+Suggested top tags:
+
+- mainstream audience: `大型单机`, `PC单机`
+- strategy audience: `大战略`, `历史策略`, `国家经营`
+
+These are presentation tags, not the genre itself. Do not imply offline-only play or another unsupported capability.
+
+### Historical grand-strategy background prompt skeleton
+
+> Original grand-strategy game key art, early-modern or industrial-era geopolitical campaign, antique continental map, ruler or general in a command room, armies and sailing fleet in the middle distance, royal seals and parchment documents, navy blue and antique gold palette, cinematic but controlled lighting, premium PC strategy-game poster composition, clear upper title zone and side space for feature badges, no text, no logo, no watermark, no UI.
+
+### Sci-fi grand-strategy background prompt skeleton
+
+> Original galactic grand-strategy key art, star map and political borders, capital station or flagship, diplomatic council silhouettes, multiple fleets at strategic scale, dark navy space palette with gold/cyan interface-inspired framing but no actual UI, clean title zone, premium empire-management poster composition, no text, no logo, no watermark.
 
 ## Casual — `casual`
 
