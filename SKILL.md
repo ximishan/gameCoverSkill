@@ -1,103 +1,103 @@
 ---
 name: game-cover-maker
-description: Create high-attention Chinese game-sharing covers from a supplied screenshot/key art or from a newly generated clean game-style background. Use for 手游分享封面、Steam移植封面、PC+安卓封面、汉化版封面、DLC/存档/版本号封面、游戏推荐封面, or when the user wants bold white/yellow Chinese typography, thick black outlines, red/black brush panels, and multiple output sizes. Prefer image generation for artwork/background and deterministic Pillow rendering for exact Chinese text.
+description: Create high-attention Chinese game-sharing covers from supplied screenshots/key art or newly generated clean game backgrounds. Automatically infer the game's genre and switch cover templates for action/roguelike/shooter/RPG/strategy/casual/horror/racing/simulation/survival/anime/retro games. Supports exact Chinese text, DLC/save/version/platform callouts, and multiple output sizes. Prefer image generation for clean artwork/background and deterministic Pillow rendering for final Chinese text.
 ---
 
 # Game Cover Maker
 
-Create bold Chinese game-sharing covers in the visual language of busy game discovery feeds: dramatic game art, huge readable title, white/yellow emphasis, thick black outlines, red/black brush-stroke panels, and a strong bottom platform/CTA block.
+Create bold Chinese game-sharing covers for discovery feeds and short-video platforms. The skill should not make every game look the same: it must route each game to a genre-appropriate background treatment and overlay template while keeping the wording exact and readable at thumbnail size.
 
-The user's explicit wording, target size, and platform claims always take precedence over this skill.
+The user's explicit wording, target size, genre/style override, and platform claims always take precedence.
 
 ## Core workflow
 
 Use a two-stage workflow whenever possible:
 
-1. **Create or prepare a clean background**
-   - If the user supplied a screenshot, poster, key art, or local image, use it directly.
-   - If the user did not supply artwork, generate a game-appropriate action background that matches the game's genre and mood.
-   - When generating artwork, request **no text, no logos, no UI labels, no watermarks**. Leave useful negative space for title and feature blocks.
-   - Do not imitate an official cover exactly. Create an original background with a similar genre/mood.
-2. **Render all Chinese wording deterministically** with `scripts/render_cover.py`.
-   - This keeps game names, DLC claims, version numbers, and platform labels exact.
-   - Do not rely on image generation to spell important Chinese text when exact wording matters.
+1. **Determine game type and template**
+   - Infer genre from the user's description, game name, screenshots, or known game context.
+   - Default to automatic routing; do not ask the user to choose a style when the genre is reasonably clear.
+   - If the genre is genuinely ambiguous, use `general` rather than blocking the task.
+   - The renderer also supports `--genre auto` as a fallback keyword detector.
+2. **Create or prepare a clean background**
+   - If the user supplied a screenshot, poster, key art, or local image, use it directly when suitable.
+   - If no usable artwork is supplied, generate a new original background matching the detected genre.
+   - Generated backgrounds must contain **no text, no title, no platform logo, no UI label, no watermark**.
+   - Leave negative space for the title, feature blocks, and bottom platform/CTA area.
+   - Do not imitate an official cover exactly; create an original scene with the same genre/mood.
+3. **Render exact copy deterministically** with `scripts/render_cover.py`.
+   - Chinese game names, DLC wording, version numbers, and platform labels must be exact.
+   - Do not rely on image generation to spell important Chinese text.
+4. **Quality-check each requested size independently**.
+   - Reflow text and crop the source separately for each aspect ratio.
+   - Never stretch one finished cover into another size.
 
-## Default visual hierarchy
+## Automatic genre routing
 
-Unless the user asks for another layout, use this order:
+Use the closest genre family below. Detailed design/background guidance lives in `references/genre_templates.md`.
+
+| Genre | Renderer value | Template behavior |
+| --- | --- | --- |
+| 动作 | `action` | 红黑冲击、笔刷块、强攻击感 |
+| Roguelike / 肉鸽 | `roguelike` | 深红黑、地牢感、危险氛围 |
+| 射击 | `shooter` | 橙黑战术、斜切面板、速度/火力感 |
+| RPG / ARPG | `rpg` | 深蓝紫 + 金色、史诗框体 |
+| 策略 / SLG / 塔防 | `strategy` | 海军蓝 + 金色、指挥/战役感 |
+| 休闲 / 益智 / 卡牌 | `casual` | 高亮蓝橙、圆角卡片、轻松清晰 |
+| 恐怖 / 惊悚 | `horror` | 低饱和黑红、压迫感、血色强调 |
+| 赛车 / 竞速 | `racing` | 青橙霓虹、斜切面板、极速感 |
+| 模拟 / 经营 / 建造 | `simulation` | 青绿、圆角、干净现代 |
+| 生存 / 末日 | `survival` | 橄榄/土黄、粗粝笔刷、荒野感 |
+| 二次元 / 动漫 | `anime` | 粉紫 + 青色霓虹、圆角/高饱和 |
+| 像素 / 复古 | `retro` | 紫粉/青色、像素块面板 |
+| 未识别 | `general` | 通用高冲击黄白黑红模板 |
+
+### Auto-routing rules
+
+- If the user explicitly says a genre, pass it with `--genre`.
+- If the genre is obvious from the game name/context, pass the inferred genre explicitly.
+- Otherwise use `--genre auto`; the script checks keywords in title/tag/features.
+- A user style request such as “不要红黑，做成清爽卡通风” overrides the genre default.
+
+Example: `重生细胞` should route to `roguelike`; a colorful puzzle/card game should route to `casual`; a dark survival horror game should route to `horror` or `survival` depending on the main selling point.
+
+## Default copy hierarchy
+
+Unless the user asks for another arrangement:
 
 1. Top tag: `Steam移植游戏` / `中文汉化` / `安卓直装` / `完整版`
-2. Giant game title: e.g. `重生细胞`
-3. Feature callouts: up to 3 items, e.g. `解锁全部DLC`, `内置存档`
-4. Optional version badge: e.g. `版本号 1.0.78`
-5. Giant bottom emphasis: e.g. `PC+安卓`, `手游分享`, `中文完整版`
+2. Giant game title
+3. Up to 3 feature callouts, e.g. `解锁全部DLC`, `内置存档`
+4. Optional version badge, e.g. `版本号 1.0.78`
+5. Giant bottom emphasis: `PC+安卓`, `手游分享`, `中文完整版`
 
-Visual rules:
+Use only claims provided by the user or clearly visible in supplied source material. Do not invent DLC status, unlocked content, save status, MOD functions, version numbers, platform availability, ratings, or download counts.
 
-- Game title: white, extra-bold, very large, heavy black stroke; optional red shadow/brush accent.
-- Primary selling point: yellow with black stroke on a dark/black brush panel.
-- Secondary selling point: white with black stroke on a dark panel.
-- Version badge: smaller red/black brush strip, white/yellow text.
-- Bottom emphasis: the strongest yellow element, very large, heavy black stroke, red brush backing.
-- Keep important text inside safe margins and readable around 250 px preview width.
-- Preserve the most recognizable character/scene area.
-- Do not cover a face or central action subject if a small shift can avoid it.
-
-## Copy rules
-
-Use only claims provided by the user or clearly visible in supplied source material.
-
-Do not invent:
-
-- DLC status
-- unlocked content
-- save-file status
-- MOD functionality
-- version number
-- platform availability
-- ratings/download counts
-- “破解/无限资源/全解锁” claims unless the user explicitly supplies them
-
-Keep emphasized lines short. Prefer 4–10 Chinese characters per feature line. Do not turn cover copy into paragraphs.
+Keep feature lines short. Prefer 4–10 Chinese characters per emphasized line. Do not put paragraphs on the cover.
 
 ## Output sizes
 
-The renderer supports multiple generic game-cover shapes. Use the user's exact requested size when supplied.
-
-### Built-in presets
+Use the user's exact requested size when supplied.
 
 | Preset | Pixels | Ratio | Typical use |
 | --- | ---: | ---: | --- |
 | `feed-4x5` | 1080×1350 | 4:5 | Default feed/game-share cover |
-| `portrait-3x4` | 1080×1440 | 3:4 | Portrait game poster/card |
+| `portrait-3x4` | 1080×1440 | 3:4 | Portrait poster/card |
 | `vertical-9x16` | 1080×1920 | 9:16 | Full-screen vertical cover |
-| `square-1x1` | 1080×1080 | 1:1 | Square card/avatar-style cover |
+| `square-1x1` | 1080×1080 | 1:1 | Square card |
 | `landscape-16x9` | 1920×1080 | 16:9 | Standard horizontal thumbnail |
 | `landscape-16x10` | 1600×1000 | 16:10 | Wide game card |
 
-The preset names describe generic canvases, not guaranteed official upload requirements for any third-party platform.
-
-### Custom size
-
-For any other size, use:
+For any other size:
 
 ```bash
 --size WIDTHxHEIGHT
 ```
 
-Example:
-
-```bash
---size 1242x1660
-```
-
-`--size` overrides `--preset` and `--ratio`.
-
-If the user asks for several sizes, render the same design in every requested size and check each one separately for text clipping and subject coverage. Do not simply stretch one finished image.
+Example: `--size 1242x1660`.
 
 ## Rendering examples
 
-### Rich poster style
+### Automatic genre template
 
 ```bash
 python scripts/render_cover.py background.png \
@@ -108,80 +108,70 @@ python scripts/render_cover.py background.png \
   --feature "内置存档" \
   --version "1.0.78" \
   --accent "PC+安卓" \
+  --genre auto \
   --preset feed-4x5
 ```
 
-### 9:16 version
+`重生细胞` is recognized as `roguelike`, so the renderer chooses the corresponding darker impact template.
+
+### Explicit genre override
 
 ```bash
 python scripts/render_cover.py background.png \
-  --output reborn-cell-9x16.png \
-  --title "重生细胞" \
-  --tag "Steam移植游戏" \
-  --feature "解锁全部DLC" \
-  --feature "内置存档" \
-  --version "1.0.78" \
-  --accent "PC+安卓" \
-  --preset vertical-9x16
-```
-
-### Exact custom dimensions
-
-```bash
-python scripts/render_cover.py background.png \
-  --output custom-cover.png \
-  --title "游戏名" \
-  --tag "游戏分享" \
+  --output anime-cover.png \
+  --title "超忍机" \
+  --tag "二次元动作" \
   --feature "中文完整版" \
-  --accent "PC+安卓" \
-  --size 1500x2000
+  --feature "内置存档" \
+  --accent "安卓直装" \
+  --genre anime \
+  --preset feed-4x5
 ```
 
-### Backward-compatible ratio usage
+### Several sizes
+
+Render each output separately:
 
 ```bash
---ratio 4:5
---ratio 3:4
---ratio 9:16
---ratio 1:1
---ratio 16:9
---ratio 16:10
+--preset feed-4x5
+--preset portrait-3x4
+--preset vertical-9x16
+--preset landscape-16x9
 ```
+
+Do not resize the already-rendered result.
 
 ## Background-generation guidance
 
-When no usable game art is supplied, generate a clean background before rendering text.
+When no usable art is supplied, generate the background first. Always align the artwork with the detected genre. Read `references/genre_templates.md` for concrete prompt fragments.
 
-The background prompt should describe:
+General requirements:
 
-- game genre: roguelike / action / RPG / strategy / casual / racing / survival, etc.
-- dominant subject: protagonist, vehicle, monster, battlefield, city, dungeon, etc.
-- atmosphere and palette appropriate to the game
-- dramatic depth and lighting
-- empty or calmer areas near the upper/title zone and left feature zone when possible
-- **no text, no title, no Chinese/English words, no platform logos, no watermark**
-
-For a dark action roguelike, a good composition is: central or lower-right protagonist, dark castle/dungeon environment, bright action lighting, upper area available for the title, left-middle space available for feature tags, bottom area with enough contrast for a giant platform label.
+- one recognizable main subject or scene
+- strong depth and lighting
+- calmer/emptier upper zone for title
+- some left-middle breathing room for feature callouts
+- enough bottom contrast for the final platform/CTA block
+- no text, logos, UI, watermark, fake rating badges, or fake storefront marks
 
 ## Font behavior
 
-The script searches common Chinese fonts on Windows/macOS/Linux, including Microsoft YaHei, SimHei, DengXian, PingFang, and Noto CJK. Never bundle or redistribute font files. If automatic detection fails, pass a local font path with `--font`.
+The renderer searches common Chinese fonts on Windows/macOS/Linux, including Microsoft YaHei, SimHei, DengXian, PingFang, and Noto CJK. Never bundle or redistribute font files. If automatic detection fails, pass a local font path with `--font`.
 
 ## Quality gate
 
-Before returning a cover, verify all of the following:
+Before returning a cover, verify:
 
+- detected genre/template is sensible for the game
+- background mood matches that genre
 - exact Chinese wording matches the user's copy
-- game name is unchanged
-- version number is exact
-- platform text is exact
+- game name, version, and platform text are unchanged
+- no unsupported claims were invented
 - no text is clipped
 - no important subject is hidden unnecessarily
-- title remains readable at thumbnail size
-- yellow emphasis is visually dominant
-- black outline remains visible on bright and dark regions
-- custom/multiple sizes were reflowed rather than stretched
+- title remains readable at about 250 px preview width
+- template colors/shapes are visibly different across different game genres
+- each requested output size was reflowed rather than stretched
 - generated backgrounds contain no accidental text/logos that conflict with the deterministic overlay
-- no unsupported claims were invented
 
 Return the generated image file(s) directly. Keep commentary short unless the user asks for design analysis.
