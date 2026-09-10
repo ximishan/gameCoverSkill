@@ -181,6 +181,15 @@ def text_size(draw, text, font, stroke=0):
     return box[2] - box[0], box[3] - box[1]
 
 
+def top_safe_layout(w, h):
+    ratio = h / max(w, 1)
+    if ratio >= 1.55:
+        return 0.07, 0.135
+    if h > w:
+        return 0.05, 0.105
+    return 0.04, 0.085
+
+
 def add_readability_layers(img, genre):
     w, h = img.size
     overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
@@ -233,31 +242,36 @@ def draw_panel(draw, rect, fill, shape, outline=None, width=3):
 
 
 def draw_tag(draw, text, font_path, w, h, theme):
+    tag_safe, _ = top_safe_layout(w, h)
     if not text:
-        return
+        return int(h * tag_safe)
     shape, tag_color, _, _, accent, _, _, stroke_color, *_ = theme
     size = max(30, int(min(w,h)*.045))
     font = ImageFont.truetype(font_path, size=size)
     stroke = max(3, int(size*.09))
     tw, th = text_size(draw, text, font, stroke)
     px, py = int(size*.40), int(size*.20)
-    x, y = int(w*.045), int(h*.035)
+    x, y = int(w*.045), int(h*tag_safe)
     rect = (x, y, x+tw+px*2, y+th+py*2)
     outline = accent if shape == "frame" else None
     draw_panel(draw, rect, tag_color, shape, outline, max(2,int(w*.003)))
     draw.text((x+px,y+py-2), text, font=font, fill=WHITE,
               stroke_width=stroke, stroke_fill=stroke_color)
+    return rect[3]
 
 
-def draw_title(draw, title, font_path, w, h, theme):
+def draw_title(draw, title, font_path, w, h, theme, start_y=None):
     lines = split_text(title, 7)
+    _, title_safe = top_safe_layout(w, h)
     if not lines:
-        return int(h*.12)
+        return int(h*max(.12, title_safe))
     _, _, _, _, _, shadow, _, stroke_color, *_ = theme
     stroke = max(7, int(w*.012))
     font = fit_font(draw, lines, font_path, int(w*.92),
                     int(w*.145), int(w*.072), stroke)
-    y = int(h*.085)
+    y = int(h*title_safe)
+    if start_y is not None:
+        y = max(y, int(start_y))
     for line in lines:
         tw, th = text_size(draw, line, font, stroke)
         x = int((w-tw)/2)
@@ -349,8 +363,9 @@ def render(input_path, output_path, title, tag, features, version, accent,
 
     draw = ImageDraw.Draw(img)
     w, h = img.size
-    draw_tag(draw, tag, font_path, w, h, theme)
-    title_end = draw_title(draw, title, font_path, w, h, theme)
+    tag_end = draw_tag(draw, tag, font_path, w, h, theme)
+    title_end = draw_title(draw, title, font_path, w, h, theme,
+                           tag_end + int(h*.02))
     draw_features(draw, features, version, font_path, w, h,
                   title_end + int(h*.02), theme)
     draw_bottom_accent(draw, accent, font_path, w, h, theme)
