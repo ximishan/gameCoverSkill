@@ -47,10 +47,14 @@ The user's explicit wording, target size, supplied references, genre/style overr
    - When the deterministic text-render workflow is available, generated artwork should contain no title, no platform logo, no UI label, no watermark, and no promotional copy.
    - Leave usable negative space for title, feature blocks, version badge, and accent/CTA.
 
-5. **Render exact copy**
+5. **Render exact copy inside the text-safe area**
    - Game names, DLC wording, version numbers, Chinese text, platform labels, and user-provided marketing wording must remain exact.
+   - Apply the text-safe placement rules in `references/typography_variation.md` for **every cover**, including count = 1.
+   - On `9:16`, reserve the top 7% as an unsafe band for essential text; keep the main title comfortably below it, normally beginning around 13–16% of canvas height.
+   - Never let a title, tag, badge, outline, shadow, sticker, or panel touch/cross the canvas edge.
+   - If copy is long, wrap, slightly reduce font size, move lower, or simplify decoration before ever moving text upward into the unsafe top band.
    - Prefer deterministic rendering with `scripts/render_cover.py` when exact text is critical.
-   - If text is rendered directly by image generation, inspect it closely and regenerate/fix any misspelling.
+   - If text is rendered directly by image generation, explicitly require all lettering to be fully inside frame with generous top padding; inspect it closely and regenerate/fix any misspelling or clipping.
    - Do not normalize or rewrite user copy just because another phrase sounds more natural.
 
 6. **Quality-check every size and every batch member independently**
@@ -58,6 +62,7 @@ The user's explicit wording, target size, supplied references, genre/style overr
    - Never stretch a finished cover into another size.
    - Reject or regenerate near-duplicate batch members.
    - Reject visually attractive covers that no longer resemble the requested game.
+   - Reject any cover where important text is partially outside frame or too close to the top edge to survive feed/platform cropping.
    - Reject batches where the backgrounds vary but all typography, panel shapes, and color assignments are effectively identical unless the user explicitly requested a unified series template.
 
 ## Game identity preservation
@@ -152,6 +157,8 @@ Read `references/typography_variation.md` and vary at least 3 text-design dimens
 - title alignment/placement
 - accent/CTA treatment
 
+Text-position variation must always stay inside the ratio-specific safe area. A composition is not considered diverse if its only difference is pushing the title dangerously close to the top edge.
+
 Do not use the exact same combination of red top tag + same title fill + yellow feature strip + same green badge + same bottom banner on every cover.
 
 Keep the design coherent with the real game palette. Diversity does not mean random colors.
@@ -232,8 +239,8 @@ For mainstream audiences, a broad descriptor may be clearer than a technical gen
 
 Unless the user asks for another arrangement:
 
-1. Top tag: user-supplied `tag`
-2. Giant game title
+1. Top tag: user-supplied `tag`, placed inside the top-safe area
+2. Giant game title, fully visible and comfortably below the top tag
 3. Up to 3 user-supplied feature callouts
 4. Optional version/menu badge using the exact supplied value
 5. Giant bottom emphasis only when the user supplied an `accent`
@@ -272,6 +279,7 @@ General requirements:
 - enough contrast for supplied text
 - no accidental promotional copy/logos/watermarks when exact overlay rendering is used
 - for multiple covers, change the concept substantially while keeping art-direction identity stable
+- reserve clean negative space inside the safe title zone rather than relying on the extreme top edge
 
 For `grand-strategy`, prioritize maps, borders, flags, monarchs/generals/diplomats, fleets, armies, capitals, parliament/court/war-room objects, parchment, seals, compass/globe elements.
 
@@ -294,6 +302,8 @@ Before returning a cover or batch, verify:
 - game name, version/menu text, feature text, tag, and accent are unchanged
 - marketing descriptors do not create unsupported factual claims
 - no text is clipped
+- no text, outline, shadow, badge, or panel touches the canvas edge
+- on `9:16`, essential text remains below the top 7% unsafe band and the main title begins in the upper-safe zone rather than at the edge
 - no important subject is hidden unnecessarily
 - title remains readable at about 250 px preview width
 - every output size was reflowed rather than stretched
