@@ -2,81 +2,114 @@
 
 This reference controls diversity when generating 2 or more covers for the same game. The goal is to make the covers look like different creative concepts, not near-duplicate reskins.
 
+For known games, diversity must happen **inside the game's real visual identity**. Do not create variety by changing the title into a different art style or a different-looking game.
+
 ## Default behavior
 
 When requested count >= 2, automatically enable **diversity mode**.
 
 Before generating images, build a variation plan with one row per image. Each row must differ on at least 4 of these dimensions:
 
-1. **Primary subject** — ruler, female leader, general, scholar, diplomat, explorer, council, army, vehicle, creature, no-human/map-only, etc.
-2. **Subject identity/archetype** — age, gender presentation, cultural/historical visual archetype, silhouette, costume, hair/headwear, equipment.
-3. **Camera** — close portrait, three-quarter portrait, back view, full body, low angle, overhead, wide establishing shot, tabletop view.
-4. **Scene** — throne room, war room, map table, balcony, battlefield overview, naval harbor, city panorama, diplomatic court, wilderness, dungeon, garage, etc.
-5. **Composition** — subject left/right/center, title high/center, split layout, map-dominant, character-dominant, scenery-dominant.
-6. **Secondary visual anchor** — globe, parchment map, fleet, city, weapon, monster, vehicle, magical effect, landmark cluster, technology object.
-7. **Lighting/time** — dawn, daylight, sunset, night, candlelit interior, fog, storm, neon.
-8. **Palette emphasis** — stay inside the genre family but vary dominant balance, e.g. navy/gold vs parchment/burgundy.
+1. Primary subject
+2. Subject identity/archetype
+3. Character count
+4. Camera distance/angle
+5. Scene/location
+6. Composition
+7. Secondary visual anchor
+8. Activity/action
+9. Lighting/time/weather
+10. Palette emphasis within the same game/genre family
 
-Do not count tiny prop changes as meaningful variation.
+Tiny prop swaps do not count.
+
+## Identity lock
+
+When the title is a known game, first lock:
+
+- character proportion language
+- face simplification style
+- line/shading style
+- environment/prop language
+- overall game-world visual identity
+
+Then vary concepts inside that lock.
+
+Bad variation for a dollhouse life-sim:
+
+- generic anime girl in bedroom
+- glossy 3D chibi family in kitchen
+- mascot-style kawaii mall
+- flat cartoon school
+
+These may all be cute, but they look like different games.
+
+Good variation:
+
+- same game-like 2D character language in town street
+- same game-like 2D language in home/kitchen
+- same game-like 2D language in mall/supermarket
+- same game-like 2D language in school/hospital/restaurant collage
 
 ## Strong anti-duplication rule
 
-For a batch of 4 covers, do **not** use the same dominant human archetype more than once unless the user explicitly asks for character consistency.
+For a batch of 4 covers, do not use the same dominant human archetype more than once unless the game has a fixed iconic protagonist and the user wants consistency.
 
-Bad batch:
-- Roman-looking male ruler + globe
-- Roman-looking male ruler + map
-- Roman-looking male ruler + harbor
-- Roman-looking male ruler + council
+For games with a fixed protagonist, preserve recognizability but vary pose, camera, environment, lighting, equipment state, and composition strongly.
 
-Good batch:
-- ruler portrait + globe
-- multi-leader council + map table
-- female statesperson/diplomat + court/city
-- map-and-wonders panorama with no dominant person
+For games with many interchangeable characters, vary the cast and location while preserving the game's character-design system.
 
-For games with one iconic fixed protagonist, keep the protagonist recognizable only when the user asks to preserve that character. Even then, vary pose, camera, environment, lighting, equipment state, and composition strongly.
+## Previous outputs are NOT default identity references
 
-## Previous outputs are NOT default image references
+When the user asks for more covers of the same game later in the same conversation, do not automatically feed previous AI-generated covers back into image generation as the primary visual reference. This can lock the model onto accidental AI-created faces and art drift.
 
-When the user asks for more covers of the same game later in the same conversation, do **not** automatically feed previous generated covers back into image generation as visual references. Doing so can lock the model onto the same face, costume, pose, or composition.
+Use previous AI outputs only to understand what concepts have already been used and avoid repetition.
 
-Use previous outputs only to understand what has already been used and to avoid repetition. Describe the shared style textually instead.
+For known commercial games, identity should come from:
 
-Only reuse an earlier cover as an image reference when the user explicitly asks to:
-- preserve the same character
-- continue the same visual identity
-- edit that exact image
-- create a close variant of that exact design
+1. user-supplied game screenshot/art
+2. official/publisher/store screenshots when available
+3. reliable gameplay references
+4. textual reconstruction only as fallback
 
-When diversity is the goal, treat prior covers as **negative concept history**, not positive image references.
+Only reuse a previous AI-generated cover as a positive reference when the user explicitly asks to preserve that generated character/design or edit that exact image.
 
 ## Session diversity
 
-If covers for the same title were already generated earlier in the current conversation, inspect the concepts already used and exclude them from the next batch where possible.
+If covers for the same title were already generated earlier in the conversation, track and avoid repeating:
 
-Track at minimum:
-- dominant character archetype
+- dominant character/cast
 - camera angle
 - main environment
 - dominant visual anchor
 - title/layout placement
+- activity
 
-A new batch should introduce new concept families rather than merely changing facial details.
+But do not intentionally drift away from the real game's art style just to appear different.
 
-## Recommended 4-cover plan by genre
+## Recommended 4-cover plans
 
 ### Grand Strategy
 1. Monarch/statesman portrait + continental map
-2. Multi-person diplomatic/war council + tabletop map
-3. Naval/army/capital panorama, no close portrait
+2. Diplomatic/war council + tabletop map
+3. Naval/army/capital panorama
 4. Diplomat/queen/scholar or map-only empire overview
 
 ### Civilization / 4X Strategy
 1. Classical leader + globe/wonders
 2. Multi-culture council + world map table
-3. Female or non-European leader archetype + city/culture scene
+3. Female/non-European leader + city/culture scene
 4. Map-and-wonders panorama with no dominant human
+
+### Cozy life-sim / dollhouse
+Keep the game's authentic cartoon/character language consistent across all four.
+
+1. town street / café / park / outdoor social scene
+2. home / bedroom / kitchen / furniture scene
+3. mall / clothing / supermarket / dress-up scene
+4. school + hospital + restaurant / multi-location collage
+
+Do not replace the game's actual-looking characters with generic anime chibi just to make the covers more colorful.
 
 ### Action / Roguelike
 1. Hero close action pose
@@ -87,8 +120,8 @@ A new batch should introduce new concept families rather than merely changing fa
 ### Shooter
 1. Soldier close-up
 2. Squad scene
-3. Vehicle/battlefield-dominant wide shot
-4. Urban/tactical map or weapon-dominant composition
+3. Vehicle/battlefield wide shot
+4. Urban/tactical or weapon-dominant composition
 
 ### RPG / Anime
 1. Main hero portrait
@@ -102,26 +135,15 @@ A new batch should introduce new concept families rather than merely changing fa
 3. Multi-car race scene
 4. Cockpit/city-track/environment-dominant scene
 
-## Civilization 6 example
-
-For four covers of `文明6`, avoid four variants of the same laurel-crowned Roman-looking man.
-
-A better plan:
-
-- Cover A: Roman/classical statesman, close three-quarter portrait, globe + ancient city.
-- Cover B: Chinese/East Asian imperial strategist or scholar, war-room/map-table scene.
-- Cover C: female ruler/diplomat from a different visual tradition, palace/cultural-city scene.
-- Cover D: no dominant human; giant world map, wonders, ships, districts, armies and trade routes.
-
-The text layer can remain consistent while the background concept changes substantially.
-
 ## Quality gate for batches
 
 Before returning a batch, verify:
 
-- no two covers share the same dominant face + costume + camera combination
-- at least one cover changes the number of people
-- at least one cover changes the environment category
-- at least one cover changes the camera distance
-- for 4+ covers, strongly prefer at least one no-dominant-human composition when the genre permits
-- prior same-game outputs in the conversation were not accidentally reused as positive image references
+- all covers still look like the same requested game
+- known-game character/art identity has not drifted into a generic substitute
+- no two covers share the same dominant face + costume + camera combination unless required by a fixed protagonist
+- at least one cover changes character count
+- at least one cover changes environment category
+- at least one cover changes camera distance
+- for 4+ covers, prefer at least one environment/map/multi-scene composition where appropriate
+- previous AI-generated covers were not accidentally used as the main identity reference
