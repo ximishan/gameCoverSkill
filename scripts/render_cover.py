@@ -184,9 +184,9 @@ def text_size(draw, text, font, stroke=0):
 def top_safe_layout(w, h):
     ratio = h / max(w, 1)
     if ratio >= 1.55:
-        return 0.07, 0.135
+        return 0.09, 0.165
     if h > w:
-        return 0.05, 0.105
+        return 0.06, 0.115
     return 0.04, 0.085
 
 
@@ -286,7 +286,7 @@ def draw_title(draw, title, font_path, w, h, theme, start_y=None):
 
 def draw_features(draw, features, version, font_path, w, h, start_y, theme):
     shape, _, panel_a, panel_b, accent, _, version_color, stroke_color, *_ = theme
-    y = max(start_y, int(h*.30))
+    y = max(start_y, int(h*.32))
     x = int(w*.045)
     max_panel_w = int(w*.74)
     base_size = max(34, int(w*.066))
@@ -365,9 +365,9 @@ def render(input_path, output_path, title, tag, features, version, accent,
     w, h = img.size
     tag_end = draw_tag(draw, tag, font_path, w, h, theme)
     title_end = draw_title(draw, title, font_path, w, h, theme,
-                           tag_end + int(h*.02))
+                           tag_end + int(h*.025))
     draw_features(draw, features, version, font_path, w, h,
-                  title_end + int(h*.02), theme)
+                  title_end + int(h*.025), theme)
     draw_bottom_accent(draw, accent, font_path, w, h, theme)
 
     out = Path(output_path)
