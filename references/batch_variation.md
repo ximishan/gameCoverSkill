@@ -4,6 +4,8 @@ This reference controls diversity when generating 2 or more covers for the same 
 
 For known games, diversity must happen **inside the game's real visual identity**. Do not create variety by changing the title into a different art style or a different-looking game.
 
+Also read `references/typography_variation.md`. Scene diversity and text-layer diversity are separate requirements: different backgrounds should not receive the exact same pasted-on text system by default.
+
 ## Default behavior
 
 When requested count >= 2, automatically enable **diversity mode**.
@@ -22,6 +24,8 @@ Before generating images, build a variation plan with one row per image. Each ro
 10. Palette emphasis within the same game/genre family
 
 Tiny prop swaps do not count.
+
+In addition, vary at least 3 text-design dimensions between neighboring covers, such as title treatment, tag shape, feature-card treatment, version-badge placement, color-role assignment, or text alignment.
 
 ## Identity lock
 
@@ -59,6 +63,32 @@ For games with a fixed protagonist, preserve recognizability but vary pose, came
 
 For games with many interchangeable characters, vary the cast and location while preserving the game's character-design system.
 
+## Text-layer anti-duplication rule
+
+Do not treat typography as a fixed transparent overlay pasted onto every batch member.
+
+Bad batch:
+
+- same red top tag
+- same rainbow title
+- same yellow feature strip
+- same green menu/version badge
+- same red bottom CTA
+- only the background changes
+
+Good batch:
+
+- same exact copy, but different title treatment
+- different tag shapes/positions
+- different feature-card arrangements
+- different but game-compatible color role assignments
+- different version-badge placement
+- one cleaner cover with fewer filled panels if the user did not request an accent
+
+If the user explicitly asks for a unified series template, keep stronger consistency; otherwise default to visible text-layer variation in batches.
+
+Never create diversity by changing the wording. Copy stays exact.
+
 ## Previous outputs are NOT default identity references
 
 When the user asks for more covers of the same game later in the same conversation, do not automatically feed previous AI-generated covers back into image generation as the primary visual reference. This can lock the model onto accidental AI-created faces and art drift.
@@ -84,38 +114,42 @@ If covers for the same title were already generated earlier in the conversation,
 - dominant visual anchor
 - title/layout placement
 - activity
+- title treatment
+- tag shape/color
+- feature-card arrangement
+- accent/banner treatment
 
 But do not intentionally drift away from the real game's art style just to appear different.
 
 ## Recommended 4-cover plans
 
 ### Grand Strategy
-1. Monarch/statesman portrait + continental map
-2. Diplomatic/war council + tabletop map
-3. Naval/army/capital panorama
-4. Diplomat/queen/scholar or map-only empire overview
+1. Monarch/statesman portrait + continental map; framed gold title; small burgundy tag
+2. Diplomatic/war council + tabletop map; light title with dark outline; paired feature plaques
+3. Naval/army/capital panorama; title on parchment/navy panel; compact side badges
+4. Diplomat/queen/scholar or map-only empire overview; cleaner title treatment and minimal badges
 
 ### Civilization / 4X Strategy
-1. Classical leader + globe/wonders
-2. Multi-culture council + world map table
-3. Female/non-European leader + city/culture scene
-4. Map-and-wonders panorama with no dominant human
+1. Classical leader + globe/wonders; gold title
+2. Multi-culture council + world map table; white title with navy/gold outline
+3. Female/non-European leader + city/culture scene; burgundy/navy two-tone accents
+4. Map-and-wonders panorama with no dominant human; clean centered title and compact feature chips
 
 ### Cozy life-sim / dollhouse
 Keep the game's authentic cartoon/character language consistent across all four.
 
-1. town street / café / park / outdoor social scene
-2. home / bedroom / kitchen / furniture scene
-3. mall / clothing / supermarket / dress-up scene
-4. school + hospital + restaurant / multi-location collage
+1. town street / café / park; playful multicolor title + pink tag + cream feature strip
+2. home / bedroom / kitchen; white/pastel title + mint tag + small rounded feature card
+3. mall / clothing / supermarket; pink-blue title + yellow corner tag + compact menu/version chip
+4. school + hospital + restaurant collage; cleaner title + several small pastel stickers instead of one repeated giant strip
 
 Do not replace the game's actual-looking characters with generic anime chibi just to make the covers more colorful.
 
 ### Action / Roguelike
-1. Hero close action pose
-2. Enemy/boss-dominant scene
-3. Wide environmental combat scene
-4. Weapon/ability/environment-dominant composition
+1. Hero close action pose; huge white title + yellow accent
+2. Enemy/boss-dominant scene; red title panel + compact feature chips
+3. Wide environmental combat scene; outlined title without full panel
+4. Weapon/ability/environment-dominant composition; asymmetric title + corner badges
 
 ### Shooter
 1. Soldier close-up
@@ -123,17 +157,23 @@ Do not replace the game's actual-looking characters with generic anime chibi jus
 3. Vehicle/battlefield wide shot
 4. Urban/tactical or weapon-dominant composition
 
+Use orange/black/white roles differently across the four rather than repeating the exact same slanted panels.
+
 ### RPG / Anime
 1. Main hero portrait
 2. Party ensemble
 3. Villain/monster/magic-dominant scene
 4. World/city/environment panorama
 
+Vary framed title, gradient title, floating chips, and cleaner text treatments while keeping the game's brand colors.
+
 ### Racing
 1. Front three-quarter hero car
 2. Rear chase angle
 3. Multi-car race scene
 4. Cockpit/city-track/environment-dominant scene
+
+Rotate cyan/orange/white emphasis and slanted label placement.
 
 ## Quality gate for batches
 
@@ -147,3 +187,6 @@ Before returning a batch, verify:
 - at least one cover changes camera distance
 - for 4+ covers, prefer at least one environment/map/multi-scene composition where appropriate
 - previous AI-generated covers were not accidentally used as the main identity reference
+- text content is identical to the supplied copy unless the user requested copy changes
+- neighboring covers do not reuse the same title treatment + tag shape + feature-card arrangement + color-role mapping
+- if the user did not supply an accent/CTA, no extra bottom banner is invented merely for symmetry
