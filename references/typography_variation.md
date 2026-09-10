@@ -32,9 +32,10 @@ For portrait covers, especially `9:16`, reserve a larger top safe area because f
 
 Default safe-area rules:
 
-- `9:16`: no essential glyph, outline, shadow, sticker, or text panel may enter the top **7%** of the canvas
-- `9:16`: the main game title should normally begin around **13–16%** of canvas height; do not place its first visible pixel above **12%**
-- `4:5` / `3:4`: keep essential text below the top **5%**; main title should normally begin around **10–13%**
+- `9:16`: no essential glyph, outline, shadow, sticker, or text panel may enter the top **9%** of the canvas
+- `9:16`: the main game title should normally begin around **16–19%** of canvas height; do not place its first visible pixel above **15%**
+- `9:16`: when a top tag exists, place the tag around **9–11%** height, then leave a clear visual gap before the title; prefer lowering the title rather than compressing the gap
+- `4:5` / `3:4`: keep essential text below the top **6%**; main title should normally begin around **11–14%**
 - square / landscape: keep at least **4%** top breathing room unless the user explicitly requests edge-aligned typography
 - keep left/right text edges at least **4–5%** inside the canvas, including stroke, shadow, and panel decoration
 - if a top tag exists, place it inside the safe area first, then place the title below it with visible separation; the tag and title must never collide
@@ -49,7 +50,7 @@ When text is long, resolve overflow in this order:
 
 Do **not** solve overflow by moving the title upward into the unsafe top band.
 
-For direct image-generation typography, explicitly describe the title as **fully inside frame, comfortably below the top edge, with generous top padding and no cropped letters**. If any letter, outline, shadow, or badge is cut by the canvas edge, treat the cover as failed and regenerate/fix it.
+For direct image-generation typography, explicitly describe the title as **fully inside frame, comfortably lower than the top edge, with generous top padding and no cropped letters**. For `9:16`, prefer a visually relaxed upper composition with noticeable sky/background breathing room above the tag. If any letter, outline, shadow, or badge is cut by the canvas edge, treat the cover as failed and regenerate/fix it.
 
 ## Variation dimensions
 
@@ -157,7 +158,7 @@ Instead rotate the text system while preserving the game's playful identity:
 3. pink/blue two-tone title + yellow corner sticker + blue version/menu chip
 4. cleaner white title + colored shadow + several small pastel stickers instead of one giant feature bar
 
-For `9:16`, keep all four variants comfortably below the top safe boundary even when the title treatment changes.
+For `9:16`, keep all four variants comfortably below the top safe boundary even when the title treatment changes. Prefer the tag near 9–11% height and the title around 16–19% rather than packing the whole text stack against the top edge.
 
 If no `accent` is supplied, do **not** invent or duplicate a bottom CTA just to fill space. Let the artwork breathe.
 
@@ -181,7 +182,8 @@ Before returning a multi-cover batch, verify:
 
 - the text content is exact on every cover
 - no title, tag, badge, outline, shadow, or panel is clipped by the top/left/right canvas edge
-- on `9:16`, essential text stays below the top 7% unsafe band and the main title starts in the intended upper-safe zone
+- on `9:16`, essential text stays below the top 9% unsafe band and the main title starts around the intended 16–19% upper-safe zone
+- the upper edge has visible breathing room rather than looking text-heavy or cramped
 - neighboring covers do not reuse the same title fill + tag shape + feature-card colors + CTA treatment
 - title remains readable at thumbnail size
 - text colors fit the game's actual art direction
