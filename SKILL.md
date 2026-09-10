@@ -50,11 +50,12 @@ The user's explicit wording, target size, supplied references, genre/style overr
 5. **Render exact copy inside the text-safe area**
    - Game names, DLC wording, version numbers, Chinese text, platform labels, and user-provided marketing wording must remain exact.
    - Apply the text-safe placement rules in `references/typography_variation.md` for **every cover**, including count = 1.
-   - On `9:16`, reserve the top 7% as an unsafe band for essential text; keep the main title comfortably below it, normally beginning around 13–16% of canvas height.
+   - On `9:16`, reserve the top **9%** as an unsafe band for essential text; place the top tag around **9–11%** and keep the main title comfortably lower, normally beginning around **16–19%** of canvas height.
+   - The title's first visible pixel should not rise above roughly **15%** on `9:16` unless the user explicitly requests a high title layout.
    - Never let a title, tag, badge, outline, shadow, sticker, or panel touch/cross the canvas edge.
    - If copy is long, wrap, slightly reduce font size, move lower, or simplify decoration before ever moving text upward into the unsafe top band.
    - Prefer deterministic rendering with `scripts/render_cover.py` when exact text is critical.
-   - If text is rendered directly by image generation, explicitly require all lettering to be fully inside frame with generous top padding; inspect it closely and regenerate/fix any misspelling or clipping.
+   - If text is rendered directly by image generation, explicitly require all lettering to be fully inside frame, **visibly lower than the top edge**, with generous top breathing room; inspect it closely and regenerate/fix any misspelling or clipping.
    - Do not normalize or rewrite user copy just because another phrase sounds more natural.
 
 6. **Quality-check every size and every batch member independently**
@@ -62,7 +63,7 @@ The user's explicit wording, target size, supplied references, genre/style overr
    - Never stretch a finished cover into another size.
    - Reject or regenerate near-duplicate batch members.
    - Reject visually attractive covers that no longer resemble the requested game.
-   - Reject any cover where important text is partially outside frame or too close to the top edge to survive feed/platform cropping.
+   - Reject any cover where important text is partially outside frame, visually cramped against the top edge, or too high to survive feed/platform cropping.
    - Reject batches where the backgrounds vary but all typography, panel shapes, and color assignments are effectively identical unless the user explicitly requested a unified series template.
 
 ## Game identity preservation
@@ -239,8 +240,8 @@ For mainstream audiences, a broad descriptor may be clearer than a technical gen
 
 Unless the user asks for another arrangement:
 
-1. Top tag: user-supplied `tag`, placed inside the top-safe area
-2. Giant game title, fully visible and comfortably below the top tag
+1. Top tag: user-supplied `tag`, placed around the upper safe zone rather than near the canvas edge
+2. Giant game title, fully visible and noticeably below the top tag
 3. Up to 3 user-supplied feature callouts
 4. Optional version/menu badge using the exact supplied value
 5. Giant bottom emphasis only when the user supplied an `accent`
@@ -280,6 +281,7 @@ General requirements:
 - no accidental promotional copy/logos/watermarks when exact overlay rendering is used
 - for multiple covers, change the concept substantially while keeping art-direction identity stable
 - reserve clean negative space inside the safe title zone rather than relying on the extreme top edge
+- on `9:16`, preserve visible artwork/sky/background above the top tag so the typography stack feels intentionally lowered rather than top-heavy
 
 For `grand-strategy`, prioritize maps, borders, flags, monarchs/generals/diplomats, fleets, armies, capitals, parliament/court/war-room objects, parchment, seals, compass/globe elements.
 
@@ -303,7 +305,8 @@ Before returning a cover or batch, verify:
 - marketing descriptors do not create unsupported factual claims
 - no text is clipped
 - no text, outline, shadow, badge, or panel touches the canvas edge
-- on `9:16`, essential text remains below the top 7% unsafe band and the main title begins in the upper-safe zone rather than at the edge
+- on `9:16`, essential text remains below the top **9%** unsafe band, the tag sits around **9–11%**, and the main title begins around **16–19%** rather than crowding the top
+- the upper edge has visible breathing room before the first important text element
 - no important subject is hidden unnecessarily
 - title remains readable at about 250 px preview width
 - every output size was reflowed rather than stretched
