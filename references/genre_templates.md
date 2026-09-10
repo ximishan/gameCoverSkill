@@ -2,11 +2,15 @@
 
 This file defines the visual families used by `game-cover-maker`. The goal is not merely to recolor one layout: different game types should feel like different cover systems while preserving the same high-readability information hierarchy.
 
+For multi-image requests, combine these genre rules with `references/batch_variation.md`. A genre defines the visual family; it must not force every cover to reuse the same face, costume, camera angle, or scene.
+
 ## Action — `action`
 
 Overlay: red/black impact theme, rough brush panels, huge white title, yellow CTA, aggressive contrast.
 
 Background prompt direction: dynamic hero mid-attack, debris/sparks, strong diagonal motion, hard rim light, dark environment, subject centered or lower-right, clean upper title zone.
+
+Batch variation ideas: hero close-up, enemy/boss focus, wide combat scene, environment/weapon/ability-dominant scene.
 
 Best for: action games, fighting, soulslike, boss-rush.
 
@@ -16,6 +20,8 @@ Overlay: deeper crimson/black than action, rugged brush geometry, gold-yellow em
 
 Background: dungeon/castle/underworld mood, dangerous enemies, high-contrast magical/fire lighting, repeat-run/harsh-world feeling without literal text.
 
+Batch variation ideas: hero, boss, dungeon panorama, relic/weapon/portal-centered composition.
+
 Best for: Dead Cells-like, Hades-like, dungeon roguelikes.
 
 ## Shooter — `shooter`
@@ -23,6 +29,8 @@ Best for: Dead Cells-like, Hades-like, dungeon roguelikes.
 Overlay: tactical orange/black, slanted panels, compact military-tech feel.
 
 Background: weapon/action subject, muzzle light or explosive highlights, smoke, battlefield/urban combat depth, motion lines; reserve upper/left text space.
+
+Batch variation ideas: single soldier, squad, vehicle scene, battlefield/urban wide shot.
 
 Best for: FPS/TPS, military shooters, run-and-gun.
 
@@ -32,6 +40,8 @@ Overlay: navy/purple + gold, framed panels, epic/fantasy tone.
 
 Background: hero party, magic, grand city/castle/world vista, cinematic light, fewer chaotic foreground objects near text.
 
+Batch variation ideas: main hero, party ensemble, villain/monster, world/city panorama.
+
 Best for: JRPG, ARPG, fantasy adventure.
 
 ## Strategy — `strategy`
@@ -39,6 +49,15 @@ Best for: JRPG, ARPG, fantasy adventure.
 Overlay: dark navy + muted gold, framed/command-board geometry, controlled visual hierarchy.
 
 Background: battlefield overview, commanders, tactical maps, cities, units, defensive lines, strategic scale, more negative space than action templates.
+
+For civilization/4X-style strategy, do not default every image to the same Greco-Roman male ruler. Rotate between leader archetypes, council scenes, map-only/wonders scenes, city panoramas, and different cultural visual traditions when the game supports them.
+
+Suggested 4-cover civilization-style rotation:
+
+1. one classical leader portrait
+2. one East Asian / non-European strategist or scholar scene
+3. one female ruler/diplomat or multi-leader council
+4. one no-dominant-human map/wonders/city panorama
 
 Best for: RTS, tower defense, conventional SLG, civilization-style strategy.
 
@@ -57,6 +76,15 @@ Background prompt direction:
 - strong depth but controlled composition; avoid excessive explosion/fire effects
 - reserve a clean upper/center title zone and one side for feature cards
 - palette: deep navy / royal blue / parchment beige / antique gold; optional burgundy accent
+
+For batches, deliberately rotate the dominant concept instead of repeatedly generating a crowned European male ruler. Useful families include:
+
+- monarch/statesman portrait
+- cabinet / diplomatic council
+- war-room map table
+- naval/army/capital panorama
+- female ruler/diplomat/scholar
+- map-first or no-human geopolitical overview
 
 Best for:
 
@@ -77,6 +105,8 @@ These are presentation tags, not the genre itself. Do not imply offline-only pla
 ### Historical grand-strategy background prompt skeleton
 
 > Original grand-strategy game key art, early-modern or industrial-era geopolitical campaign, antique continental map, ruler or general in a command room, armies and sailing fleet in the middle distance, royal seals and parchment documents, navy blue and antique gold palette, cinematic but controlled lighting, premium PC strategy-game poster composition, clear upper title zone and side space for feature badges, no text, no logo, no watermark, no UI.
+
+For additional images of the same game, change the subject class and scene rather than rewriting minor details around this same skeleton.
 
 ### Sci-fi grand-strategy background prompt skeleton
 
@@ -147,3 +177,7 @@ Use only when a genre cannot be inferred reliably. It should remain a safe high-
 ## Prompt safety rule
 
 When generating a new background, never request exact recreation of an official game cover. Describe the genre, mood, subject, composition, and lighting. Request no text/logos/watermarks. Final exact text is added by the renderer.
+
+## Batch reference rule
+
+Do not automatically attach previous generated covers of the same game as positive visual references when the goal is variety. This often reproduces the same person and composition. Use earlier images as a record of concepts to avoid. See `references/batch_variation.md`.
