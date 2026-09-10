@@ -24,6 +24,33 @@ When requested count >= 2:
 
 If the user explicitly asks for a unified series identity, keep a shared design system but still allow subtle variation in badge placement, panel shape, or emphasis color.
 
+## Text safe area
+
+**Text visibility overrides decorative placement and batch variation.** Never push title/tag text toward the top edge just to create a different composition.
+
+For portrait covers, especially `9:16`, reserve a larger top safe area because feed previews and platform UI may visually crop or cover the extreme top of the image.
+
+Default safe-area rules:
+
+- `9:16`: no essential glyph, outline, shadow, sticker, or text panel may enter the top **7%** of the canvas
+- `9:16`: the main game title should normally begin around **13–16%** of canvas height; do not place its first visible pixel above **12%**
+- `4:5` / `3:4`: keep essential text below the top **5%**; main title should normally begin around **10–13%**
+- square / landscape: keep at least **4%** top breathing room unless the user explicitly requests edge-aligned typography
+- keep left/right text edges at least **4–5%** inside the canvas, including stroke, shadow, and panel decoration
+- if a top tag exists, place it inside the safe area first, then place the title below it with visible separation; the tag and title must never collide
+- measure the full visible text bounds, including outline, drop shadow, stickers, ribbons, and panels—not only the font baseline
+
+When text is long, resolve overflow in this order:
+
+1. wrap/reflow the title
+2. reduce font size slightly
+3. move lower within the safe composition area
+4. simplify decorative panels
+
+Do **not** solve overflow by moving the title upward into the unsafe top band.
+
+For direct image-generation typography, explicitly describe the title as **fully inside frame, comfortably below the top edge, with generous top padding and no cropped letters**. If any letter, outline, shadow, or badge is cut by the canvas edge, treat the cover as failed and regenerate/fix it.
+
 ## Variation dimensions
 
 Vary any combination of:
@@ -67,9 +94,9 @@ Vary any combination of:
 
 6. **Text alignment / placement**
    - centered stack
-   - upper-left title cluster
+   - upper-left title cluster inside the safe area
    - split left/right feature cards
-   - title high + feature badges mid-frame
+   - upper-safe title + feature badges mid-frame
    - title mid-frame + small top tag
 
 7. **Emphasis method**
@@ -92,6 +119,8 @@ For a batch of 4, a good default is:
 - Cover D — cleaner/minimal title; small floating badges; more of the background remains visible
 
 The four covers should still belong to one series, but should not look like the same text layer pasted over four different backgrounds.
+
+Safe-area limits remain fixed across the whole batch. Variation may move the title left/right or lower, but must not move it above the minimum top-safe boundary.
 
 ## Known-game identity rule
 
@@ -128,6 +157,8 @@ Instead rotate the text system while preserving the game's playful identity:
 3. pink/blue two-tone title + yellow corner sticker + blue version/menu chip
 4. cleaner white title + colored shadow + several small pastel stickers instead of one giant feature bar
 
+For `9:16`, keep all four variants comfortably below the top safe boundary even when the title treatment changes.
+
 If no `accent` is supplied, do **not** invent or duplicate a bottom CTA just to fill space. Let the artwork breathe.
 
 ## Exact-copy rule
@@ -149,6 +180,8 @@ If image generation cannot reliably spell important text, generate clean artwork
 Before returning a multi-cover batch, verify:
 
 - the text content is exact on every cover
+- no title, tag, badge, outline, shadow, or panel is clipped by the top/left/right canvas edge
+- on `9:16`, essential text stays below the top 7% unsafe band and the main title starts in the intended upper-safe zone
 - neighboring covers do not reuse the same title fill + tag shape + feature-card colors + CTA treatment
 - title remains readable at thumbnail size
 - text colors fit the game's actual art direction
