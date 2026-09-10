@@ -1,6 +1,6 @@
 ---
 name: game-cover-maker
-description: Create high-attention Chinese game-sharing covers from screenshots/key art or newly generated backgrounds. Automatically infer game type, preserve recognizable game identity for known titles, switch genre-appropriate templates, support exact Chinese text, DLC/save/version/platform callouts, multiple sizes, and strong same-game batch diversity. Prefer image generation for artwork/background and deterministic Pillow rendering for final Chinese text.
+description: Create high-attention Chinese game-sharing covers from screenshots/key art or newly generated backgrounds. Automatically infer game type, preserve recognizable game identity for known titles, switch genre-appropriate templates, support exact Chinese text, DLC/save/version/platform callouts, multiple sizes, strong same-game batch diversity, and varied typography/panel systems across multi-cover batches. Prefer image generation for artwork/background and deterministic Pillow rendering for final Chinese text.
 ---
 
 # Game Cover Maker
@@ -32,11 +32,13 @@ The user's explicit wording, target size, supplied references, genre/style overr
    - Only use `genre-inspired` artwork when the game is unknown, references are unavailable, or the user explicitly requests a redesign.
 
 3. **Plan batch diversity when count >= 2**
-   - Read `references/batch_variation.md`.
+   - Read `references/batch_variation.md` and `references/typography_variation.md`.
    - Enable diversity mode automatically.
-   - Build one distinct concept per requested image.
+   - Build one distinct visual concept per requested image.
    - Vary scene, subject, camera, activity, composition, and visual anchor while keeping the same game's visual language locked.
-   - Do not generate four near-identical faces or four covers that look like four different games.
+   - Also vary the text system between batch members: title treatment, tag shape, feature-card arrangement, color-role assignment, version placement, and accent treatment.
+   - Do not generate four near-identical faces, and do not paste the exact same text layer over four different backgrounds.
+   - Do not create variety by changing the wording.
 
 4. **Create or prepare artwork/background**
    - Use supplied screenshot/poster/key art when suitable.
@@ -45,15 +47,18 @@ The user's explicit wording, target size, supplied references, genre/style overr
    - When the deterministic text-render workflow is available, generated artwork should contain no title, no platform logo, no UI label, no watermark, and no promotional copy.
    - Leave usable negative space for title, feature blocks, version badge, and accent/CTA.
 
-5. **Render exact copy deterministically** with `scripts/render_cover.py` when practical.
-   - Game names, DLC wording, version numbers, Chinese text, and platform labels must be exact.
-   - Do not rely on image generation to spell important text when an exact overlay can be rendered afterward.
+5. **Render exact copy**
+   - Game names, DLC wording, version numbers, Chinese text, platform labels, and user-provided marketing wording must remain exact.
+   - Prefer deterministic rendering with `scripts/render_cover.py` when exact text is critical.
+   - If text is rendered directly by image generation, inspect it closely and regenerate/fix any misspelling.
+   - Do not normalize or rewrite user copy just because another phrase sounds more natural.
 
 6. **Quality-check every size and every batch member independently**
    - Re-crop and reflow each ratio.
    - Never stretch a finished cover into another size.
    - Reject or regenerate near-duplicate batch members.
    - Reject visually attractive covers that no longer resemble the requested game.
+   - Reject batches where the backgrounds vary but all typography, panel shapes, and color assignments are effectively identical unless the user explicitly requested a unified series template.
 
 ## Game identity preservation
 
@@ -111,7 +116,7 @@ Only reuse an earlier AI-generated cover as a positive reference when the user e
 
 For known commercial games, use the real game's visual references for identity and previous AI outputs only to avoid repeating concepts.
 
-### Mandatory variation dimensions
+### Mandatory visual variation dimensions
 
 For each cover in a batch, vary at least 4 of:
 
@@ -130,9 +135,38 @@ Tiny prop swaps do not count.
 
 For a batch of 4, do not use the same dominant human archetype more than once unless the title has one fixed iconic protagonist and the user wants protagonist consistency. For games that support it, strongly prefer at least one environment/map/multi-scene cover without a dominant close-up face.
 
+## Typography and panel diversity
+
+Text content is fixed; text presentation is not.
+
+When count >= 2, default to visible text-style variation unless the user explicitly asks for a uniform series template.
+
+Read `references/typography_variation.md` and vary at least 3 text-design dimensions between neighboring covers:
+
+- title fill/treatment
+- outline/shadow treatment
+- top-tag shape and position
+- feature-card shape and arrangement
+- version-badge position/style
+- color-role assignment
+- title alignment/placement
+- accent/CTA treatment
+
+Do not use the exact same combination of red top tag + same title fill + yellow feature strip + same green badge + same bottom banner on every cover.
+
+Keep the design coherent with the real game palette. Diversity does not mean random colors.
+
+If the user did not supply `accent`, do not invent a large bottom CTA just to fill the layout. A cleaner cover with more visible artwork is allowed and often desirable.
+
+Exact-copy examples:
+
+- `无广版` must not silently become `无广告版`
+- `自带菜单` must not silently become `内置菜单`
+- version numbers must remain unchanged
+
 ## Automatic genre routing
 
-Detailed design guidance lives in `references/genre_templates.md`; taxonomy guidance lives in `references/game_taxonomy.md`; identity guidance lives in `references/game_identity.md`; batch guidance lives in `references/batch_variation.md`.
+Detailed design guidance lives in `references/genre_templates.md`; taxonomy guidance lives in `references/game_taxonomy.md`; identity guidance lives in `references/game_identity.md`; batch guidance lives in `references/batch_variation.md`; typography guidance lives in `references/typography_variation.md`.
 
 | Genre | Renderer value | Template behavior |
 | --- | --- | --- |
@@ -198,13 +232,13 @@ For mainstream audiences, a broad descriptor may be clearer than a technical gen
 
 Unless the user asks for another arrangement:
 
-1. Top tag: `大型单机` / `大战略` / `Steam移植游戏` / `中文汉化` / `安卓直装` / `手机直装`
+1. Top tag: user-supplied `tag`
 2. Giant game title
-3. Up to 3 feature callouts
-4. Optional version badge
-5. Giant bottom emphasis: exactly the user's `accent` value when supplied
+3. Up to 3 user-supplied feature callouts
+4. Optional version/menu badge using the exact supplied value
+5. Giant bottom emphasis only when the user supplied an `accent`
 
-Use only claims provided by the user or clearly supported by supplied context. Do not invent DLC status, unlocked content, save status, MOD functions, version numbers, platform availability, ratings, download counts, or offline-only claims.
+Use only claims provided by the user or clearly supported by supplied context. Do not invent DLC status, unlocked content, save status, MOD functions, version numbers, platform availability, ratings, download counts, slogans, or offline-only claims.
 
 ## Output sizes
 
@@ -235,7 +269,7 @@ General requirements:
 - one clear primary subject or visual anchor unless using a multi-scene layout
 - genre-appropriate environment and palette without overwriting the game's own palette
 - calmer area for title and feature callouts
-- enough bottom contrast for platform/CTA
+- enough contrast for supplied text
 - no accidental promotional copy/logos/watermarks when exact overlay rendering is used
 - for multiple covers, change the concept substantially while keeping art-direction identity stable
 
@@ -257,14 +291,16 @@ Before returning a cover or batch, verify:
 - characters look like they belong to that game rather than a generic substitute
 - background props/environments match the game's visual world
 - exact Chinese wording matches the user's copy
-- game name, version, feature text, tag, and accent are unchanged
+- game name, version/menu text, feature text, tag, and accent are unchanged
 - marketing descriptors do not create unsupported factual claims
 - no text is clipped
 - no important subject is hidden unnecessarily
 - title remains readable at about 250 px preview width
 - every output size was reflowed rather than stretched
-- multi-image batches are meaningfully different in concept
+- multi-image batches are meaningfully different in scene/concept
 - multi-image batches still look like the same game
+- multi-image batches do not reuse the exact same typography/panel/color system by default
 - previous AI-generated same-game outputs were not accidentally used as the main identity reference
+- no bottom accent/CTA or extra slogan was invented when the user did not provide one
 
 Return the generated image file(s) directly. Keep commentary short unless the user asks for design analysis.
