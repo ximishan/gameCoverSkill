@@ -1,148 +1,134 @@
 # Genre Template Reference
 
-This file defines the visual families used by `game-cover-maker`. The goal is not merely to recolor one layout: different game types should feel like different cover systems while preserving the same high-readability information hierarchy.
+This file defines the visual families used by `game-cover-maker`. Genre determines the broad cover system, but for known games the real game's identity must remain recognizable. Always combine this file with `references/game_identity.md`.
 
-For multi-image requests, combine these genre rules with `references/batch_variation.md`. A genre defines the visual family; it must not force every cover to reuse the same face, costume, camera angle, or scene.
+For multi-image requests, also combine these rules with `references/batch_variation.md`. A genre must not force every cover to reuse the same face, costume, camera angle, or scene.
 
 ## Action — `action`
 
 Overlay: red/black impact theme, rough brush panels, huge white title, yellow CTA, aggressive contrast.
 
-Background prompt direction: dynamic hero mid-attack, debris/sparks, strong diagonal motion, hard rim light, dark environment, subject centered or lower-right, clean upper title zone.
+Background: dynamic hero mid-attack, debris/sparks, strong diagonal motion, hard rim light, dark environment, subject centered or lower-right, clean upper title zone.
 
-Batch variation ideas: hero close-up, enemy/boss focus, wide combat scene, environment/weapon/ability-dominant scene.
+For known games, preserve the protagonist/enemy silhouette and rendering language rather than creating a generic action hero.
 
-Best for: action games, fighting, soulslike, boss-rush.
+Batch ideas: hero close-up, enemy/boss focus, wide combat scene, environment/weapon/ability-dominant scene.
 
 ## Roguelike — `roguelike`
 
-Overlay: deeper crimson/black than action, rugged brush geometry, gold-yellow emphasis.
+Overlay: deeper crimson/black, rugged brush geometry, gold-yellow emphasis.
 
-Background: dungeon/castle/underworld mood, dangerous enemies, high-contrast magical/fire lighting, repeat-run/harsh-world feeling without literal text.
+Background: dungeon/castle/underworld mood, dangerous enemies, high-contrast magical/fire lighting.
 
-Batch variation ideas: hero, boss, dungeon panorama, relic/weapon/portal-centered composition.
+For known titles, preserve the game's actual pixel/illustration/3D language instead of replacing it with generic dark fantasy.
 
-Best for: Dead Cells-like, Hades-like, dungeon roguelikes.
+Batch ideas: hero, boss, dungeon panorama, relic/weapon/portal-centered composition.
 
 ## Shooter — `shooter`
 
 Overlay: tactical orange/black, slanted panels, compact military-tech feel.
 
-Background: weapon/action subject, muzzle light or explosive highlights, smoke, battlefield/urban combat depth, motion lines; reserve upper/left text space.
+Background: weapon/action subject, smoke, battlefield/urban combat depth, motion lines; reserve text space.
 
-Batch variation ideas: single soldier, squad, vehicle scene, battlefield/urban wide shot.
-
-Best for: FPS/TPS, military shooters, run-and-gun.
+Batch ideas: single soldier, squad, vehicle scene, battlefield/urban wide shot.
 
 ## RPG — `rpg`
 
 Overlay: navy/purple + gold, framed panels, epic/fantasy tone.
 
-Background: hero party, magic, grand city/castle/world vista, cinematic light, fewer chaotic foreground objects near text.
+Background: hero party, magic, grand city/castle/world vista, cinematic light.
 
-Batch variation ideas: main hero, party ensemble, villain/monster, world/city panorama.
+For known RPGs, character identity and art direction are more important than generic fantasy styling.
 
-Best for: JRPG, ARPG, fantasy adventure.
+Batch ideas: main hero, party ensemble, villain/monster, world/city panorama.
 
 ## Strategy — `strategy`
 
 Overlay: dark navy + muted gold, framed/command-board geometry, controlled visual hierarchy.
 
-Background: battlefield overview, commanders, tactical maps, cities, units, defensive lines, strategic scale, more negative space than action templates.
+Background: battlefield overview, commanders, tactical maps, cities, units, defensive lines, strategic scale.
 
 For civilization/4X-style strategy, do not default every image to the same Greco-Roman male ruler. Rotate between leader archetypes, council scenes, map-only/wonders scenes, city panoramas, and different cultural visual traditions when the game supports them.
 
 Suggested 4-cover civilization-style rotation:
 
-1. one classical leader portrait
-2. one East Asian / non-European strategist or scholar scene
-3. one female ruler/diplomat or multi-leader council
-4. one no-dominant-human map/wonders/city panorama
+1. classical leader portrait
+2. East Asian / non-European strategist or scholar scene
+3. female ruler/diplomat or multi-leader council
+4. no-dominant-human map/wonders/city panorama
 
 Best for: RTS, tower defense, conventional SLG, civilization-style strategy.
 
-Do **not** use this as the first choice for Paradox-style country/empire simulation when `grand-strategy` is more accurate.
+Do not use this as the first choice for Paradox-style country/empire simulation when `grand-strategy` is more accurate.
 
 ## Grand Strategy — `grand-strategy`
 
-Overlay: imperial navy, parchment gold, dark burgundy accents, ornate framed panels, premium historical/command-room feeling. The visual system should feel less like a mobile SLG ad and more like a large PC strategy title while retaining thumbnail readability.
+Overlay: imperial navy, parchment gold, dark burgundy accents, ornate framed panels, premium historical/command-room feeling.
 
-Background prompt direction:
+Background direction:
 
-- large continental/world/galactic map as a major visual anchor
+- continental/world/galactic map as a major anchor
 - ruler, statesman, general, diplomat, court, parliament, or war-room subject
-- armies and fleets shown as part of a larger national-scale system, not just close-up combat
-- flags, borders, seals, compass, globe, parchment, treaties, trade routes, capital/city silhouettes
-- strong depth but controlled composition; avoid excessive explosion/fire effects
-- reserve a clean upper/center title zone and one side for feature cards
-- palette: deep navy / royal blue / parchment beige / antique gold; optional burgundy accent
+- armies/fleets shown at national scale, not only close-up combat
+- flags, borders, seals, compass, globe, parchment, treaties, trade routes, capitals
+- controlled composition; avoid excessive explosion/fire effects
+- palette: deep navy / royal blue / parchment beige / antique gold; optional burgundy
 
-For batches, deliberately rotate the dominant concept instead of repeatedly generating a crowned European male ruler. Useful families include:
+For batches, rotate dominant concepts: monarch portrait, diplomatic council, war-room table, naval/capital panorama, female ruler/diplomat/scholar, map-first/no-human overview.
 
-- monarch/statesman portrait
-- cabinet / diplomatic council
-- war-room map table
-- naval/army/capital panorama
-- female ruler/diplomat/scholar
-- map-first or no-human geopolitical overview
-
-Best for:
-
-- `欧陆风云4` / Europa Universalis
-- `钢铁雄心4` / Hearts of Iron
-- `十字军之王3` / Crusader Kings
-- `维多利亚3` / Victoria
-- `群星` / Stellaris
-- other nation/realm/empire-scale systemic strategy games
-
-Suggested top tags:
-
-- mainstream audience: `大型单机`, `PC单机`
-- strategy audience: `大战略`, `历史策略`, `国家经营`
-
-These are presentation tags, not the genre itself. Do not imply offline-only play or another unsupported capability.
-
-### Historical grand-strategy background prompt skeleton
-
-> Original grand-strategy game key art, early-modern or industrial-era geopolitical campaign, antique continental map, ruler or general in a command room, armies and sailing fleet in the middle distance, royal seals and parchment documents, navy blue and antique gold palette, cinematic but controlled lighting, premium PC strategy-game poster composition, clear upper title zone and side space for feature badges, no text, no logo, no watermark, no UI.
-
-For additional images of the same game, change the subject class and scene rather than rewriting minor details around this same skeleton.
-
-### Sci-fi grand-strategy background prompt skeleton
-
-> Original galactic grand-strategy key art, star map and political borders, capital station or flagship, diplomatic council silhouettes, multiple fleets at strategic scale, dark navy space palette with gold/cyan interface-inspired framing but no actual UI, clean title zone, premium empire-management poster composition, no text, no logo, no watermark.
+Best for: 欧陆风云4, 钢铁雄心4, 十字军之王3, 维多利亚3, 群星 and similar nation-scale systemic strategy games.
 
 ## Casual — `casual`
 
 Overlay: bright sky blue/orange, rounded white/cream cards, softer dark stroke, clean spacing.
 
-Background: colorful friendly scene, simple shapes, large recognizable objects, daylight/soft studio lighting, uncluttered composition.
+Background: colorful friendly scene, simple shapes, large recognizable objects, daylight/soft lighting, uncluttered composition.
+
+Do not use generic kawaii/chibi styling for a known game if its actual character design is different.
 
 Best for: puzzle, card, party, cozy, family games.
 
 ## Horror — `horror`
 
-Overlay: black/blood-red, low-saturation, distressed brush blocks, red CTA instead of cheerful yellow dominance.
+Overlay: black/blood-red, low-saturation, distressed brush blocks, red CTA.
 
-Background: fog, abandoned interiors, silhouettes, narrow light source, ominous creature/figure, strong darkness around edges; avoid excessive gore.
-
-Best for: horror, thriller, zombie, dark survival horror.
+Background: fog, abandoned interiors, silhouettes, narrow light source, ominous figure, strong darkness around edges; avoid excessive gore.
 
 ## Racing — `racing`
 
 Overlay: cyan/orange neon, slanted speed panels, strong diagonals.
 
-Background: car/bike in motion, road light trails, city/night track, wheel/vehicle angle creating forward motion, plenty of motion blur away from text.
+Background: car/bike in motion, road light trails, city/night track, forward-motion camera.
 
-Best for: racing, drifting, vehicle action.
+For licensed/known racing titles, preserve recognizable vehicle classes and visual world cues when references are available.
 
 ## Simulation — `simulation`
 
-Overlay: teal/green, rounded clean panels, modern interface-like clarity without fake UI.
+Overlay: clean, friendly, readable panels. Default can use teal/green, but **the real game's own palette and art direction take priority**.
 
-Background: city/farm/shop/workspace/building scene, bright readable lighting, organized composition, realistic or polished stylized visuals.
+Background: city/farm/shop/workspace/building/life scene, organized composition, readable lighting.
 
-Best for: simulator, tycoon, management, city-builder.
+### Cozy-life-sim / dollhouse subtype
+
+Use this subtype under `simulation` for 米加小镇 / Miga-style life sims, 托卡-style world games, 阿凡达世界, and similar everyday role-play/dollhouse titles.
+
+Do not automatically turn them into generic anime chibi or glossy 3D art.
+
+When supported by visual references, preserve:
+
+- flat or lightly shaded 2D cartoon rendering
+- simple rounded doll-like proportions
+- compact facial features
+- thick/simple contour language
+- cutaway room / dollhouse framing
+- dense everyday interactive props
+- playful, colorful environments without cinematic realism
+
+Useful scenes: home/bedroom/kitchen, town street, school, hospital, restaurant, mall, clothing store, supermarket, playground, multi-location collage.
+
+For batches, change locations and activities while keeping the same character-design and prop language across every image.
+
+Best for: life simulation, town role-play, dollhouse, simulator, tycoon, management, city-builder.
 
 ## Survival — `survival`
 
@@ -150,34 +136,32 @@ Overlay: olive/brown/orange, rough rugged panels, worn outdoor feel.
 
 Background: wilderness/post-apocalypse, improvised gear, storm/fire/sunset, isolated character, resource-scarcity atmosphere.
 
-Best for: crafting, wilderness, apocalypse, extraction-survival.
-
 ## Anime — `anime`
 
-Overlay: magenta/purple + cyan neon, rounded panels, high saturation, energetic but cleaner than action.
+Overlay: magenta/purple + cyan neon, rounded panels, high saturation.
 
-Background: original anime-style hero group or single character, dramatic pose, neon/magical effects, clear face visibility, clean upper title zone.
+Background: anime-style hero group or single character, dramatic pose, magical/neon effects.
 
-Best for: anime action, gacha, character collectors, stylized JRPG.
+Only route here when the game is actually anime-styled or the user explicitly wants anime styling. Never use `anime` merely because characters are cute.
 
 ## Retro — `retro`
 
 Overlay: purple/pink/cyan, pixel-block panel shapes, cream/white title.
 
-Background: pixel-art or retro-inspired scene, arcade lighting, limited-palette feel, simple readable silhouette.
+Background: pixel-art or retro-inspired scene, arcade lighting, limited-palette feel.
 
-Best for: pixel games, retro ports, 8-bit/16-bit inspired titles.
+Known pixel games should remain pixel-like instead of becoming realistic illustrations.
 
 ## General — `general`
 
-Overlay: classic red/black brush, white title, yellow CTA.
+Overlay: classic high-impact template.
 
-Use only when a genre cannot be inferred reliably. It should remain a safe high-attention fallback, not the default for known game types.
+Use only when a genre cannot be inferred reliably. For known games with recognizable art direction, game identity still overrides this fallback.
 
-## Prompt safety rule
+## Prompt / identity rule
 
-When generating a new background, never request exact recreation of an official game cover. Describe the genre, mood, subject, composition, and lighting. Request no text/logos/watermarks. Final exact text is added by the renderer.
+Do not request an exact recreation of an official cover unless editing a supplied image. Instead, preserve the recognizable game's character/art/environment language while creating a fresh composition. When deterministic text rendering is used, request no text/logos/watermarks in the background.
 
 ## Batch reference rule
 
-Do not automatically attach previous generated covers of the same game as positive visual references when the goal is variety. This often reproduces the same person and composition. Use earlier images as a record of concepts to avoid. See `references/batch_variation.md`.
+Do not automatically attach previous AI-generated covers of the same game as positive visual references when the goal is variety. Use real game references for identity and previous AI outputs as a record of concepts to avoid.
