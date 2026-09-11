@@ -269,9 +269,9 @@ def draw_title(draw, title, font_path, w, h, theme, start_y=None):
     stroke = max(7, int(w*.012))
     font = fit_font(draw, lines, font_path, int(w*.92),
                     int(w*.145), int(w*.072), stroke)
+    # The title anchor is intentionally fixed at exactly 40% of canvas height.
+    # start_y is kept for backward compatibility but must never move the title.
     y = int(h*title_safe)
-    if start_y is not None:
-        y = max(y, int(start_y))
     for line in lines:
         tw, th = text_size(draw, line, font, stroke)
         x = int((w-tw)/2)
