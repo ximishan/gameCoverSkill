@@ -10,6 +10,8 @@ Also read `references/typography_variation.md`. Scene diversity and text-layer d
 
 When requested count >= 2, automatically enable **diversity mode**.
 
+**Hard title-height constraint:** batch diversity never includes vertical title-height variation. Unless the user explicitly requests another height, every cover keeps the main title's top anchor at approximately **40% of canvas height**. Normal optical correction is limited to about **38–42%**. Vary title styling, width, horizontal alignment, panels, colors, and supporting badges instead of moving the title upward or downward.
+
 Before generating images, build a variation plan with one row per image. Each row must differ on at least 4 of these dimensions:
 
 1. Primary subject
@@ -25,7 +27,7 @@ Before generating images, build a variation plan with one row per image. Each ro
 
 Tiny prop swaps do not count.
 
-In addition, vary at least 3 text-design dimensions between neighboring covers, such as title treatment, tag shape, feature-card treatment, version-badge placement, color-role assignment, or text alignment.
+In addition, vary at least 3 text-design dimensions between neighboring covers, such as title treatment, tag shape, feature-card treatment, version-badge placement, color-role assignment, or **horizontal** text alignment. Do not vary the main title's vertical top anchor.
 
 ## Identity lock
 
@@ -79,11 +81,13 @@ Bad batch:
 Good batch:
 
 - same exact copy, but different title treatment
-- different tag shapes/positions
+- different tag shapes/positions within their safe zone
 - different feature-card arrangements
 - different but game-compatible color role assignments
 - different version-badge placement
 - one cleaner cover with fewer filled panels if the user did not request an accent
+
+The title can look different, but its top edge should still sit around the same **40% vertical line** on every cover.
 
 If the user explicitly asks for a unified series template, keep stronger consistency; otherwise default to visible text-layer variation in batches.
 
@@ -112,7 +116,7 @@ If covers for the same title were already generated earlier in the conversation,
 - camera angle
 - main environment
 - dominant visual anchor
-- title/layout placement
+- title treatment / horizontal alignment, while keeping the vertical top anchor fixed around 40%
 - activity
 - title treatment
 - tag shape/color
@@ -188,5 +192,6 @@ Before returning a batch, verify:
 - for 4+ covers, prefer at least one environment/map/multi-scene composition where appropriate
 - previous AI-generated covers were not accidentally used as the main identity reference
 - text content is identical to the supplied copy unless the user requested copy changes
+- every main title begins around **40% of canvas height**, normally within roughly **38–42%**, unless the user explicitly overrides the title height
 - neighboring covers do not reuse the same title treatment + tag shape + feature-card arrangement + color-role mapping
 - if the user did not supply an accent/CTA, no extra bottom banner is invented merely for symmetry
