@@ -21,30 +21,28 @@ When requested count >= 2:
 - vary at least 3 text-design dimensions between neighboring covers
 - do not force every text element to use the same color family
 - do not force a large bottom banner when the user did not supply an accent/CTA
-- keep the main title's **vertical top anchor fixed around 40% of canvas height** across all batch members
+- keep the main title's **layout top anchor fixed at exactly 40% of canvas height** across all batch members
 
 If the user explicitly asks for a unified series identity, keep a shared design system but still allow subtle variation in badge placement, panel shape, or emphasis color.
 
-## Text safe area
+## Fixed title coordinate
 
-**Text visibility overrides decorative placement and batch variation.** Never push title/tag text toward the top edge just to create a different composition.
+**The main title vertical coordinate is a hard layout constraint, not a style suggestion.**
 
-The main title follows a fixed vertical-anchor rule unless the user explicitly overrides it.
+Default rules:
 
-Default safe-area rules:
+- **All ratios:** the main game title layout top anchor is exactly `y = 0.40 × canvas height` unless the user explicitly requests a different title height.
+- Do not use 38%, 42%, or another nearby title coordinate as an automatic optical correction.
+- Font metrics, antialiasing, outline, or shadow may visually extend a few pixels around the 40% anchor, but the underlying title layout coordinate must remain unchanged.
+- Batch diversity, genre templates, tag height, long copy, or feature-card layout must never alter the 40% title anchor.
+- `9:16`: no essential top tag, outline, shadow, sticker, or text panel may enter the top **9%** of the canvas.
+- `9:16`: when a top tag exists, place it around **9–11%** height; the large artwork gap between the tag and the fixed 40% title anchor is intentional.
+- `4:5` / `3:4`: keep top tags and auxiliary top labels below the top **6%** unsafe zone; the main title still begins at exactly 40%.
+- square / landscape: keep at least **4%** top breathing room for auxiliary top labels; the main title still begins at exactly 40%.
+- keep left/right text edges at least **4–5%** inside the canvas, including stroke, shadow, and panel decoration.
+- measure the full visible text bounds, including outline, drop shadow, stickers, ribbons, and panels—not only the font baseline.
 
-- **All ratios:** the main game title should begin at approximately **40% of canvas height from the top**
-- **All ratios:** treat `y = 0.40 × canvas height` as the default top anchor for the first title line
-- allow only small optical correction for stroke/shadow, normally within about **38–42%** of canvas height
-- do not move the title above **38%** merely to fit more supporting copy or to create batch variation
-- `9:16`: no essential top tag, outline, shadow, sticker, or text panel may enter the top **9%** of the canvas
-- `9:16`: when a top tag exists, place the tag around **9–11%** height; the large artwork gap between the tag and the 40% title anchor is intentional
-- `4:5` / `3:4`: keep top tags and auxiliary top labels below the top **6%** unsafe zone, while the main title still remains anchored around 40%
-- square / landscape: keep at least **4%** top breathing room for any auxiliary top label, while the main title still remains anchored around 40%
-- keep left/right text edges at least **4–5%** inside the canvas, including stroke, shadow, and panel decoration
-- measure the full visible text bounds, including outline, drop shadow, stickers, ribbons, and panels—not only the font baseline
-
-When text is long, resolve overflow in this order:
+When title copy is long, resolve overflow in this order:
 
 1. wrap/reflow the title
 2. reduce font size slightly
@@ -52,9 +50,17 @@ When text is long, resolve overflow in this order:
 4. move supporting feature/version copy lower
 5. simplify decorative panels
 
-Do **not** solve overflow by moving the title upward from the 40% anchor.
+Do **not** solve overflow by changing the title's 40% vertical anchor.
 
-For direct image-generation typography, explicitly describe the main title as **starting around the 40% vertical position**, fully inside frame, with the upper portion of the image left primarily for artwork/background and any small top tag. If the title drifts high, treat the cover as failed and regenerate/fix it.
+## Deterministic rendering requirement
+
+When the user expects exact title placement or exact Chinese copy, the normal production path is:
+
+1. generate or prepare the game artwork/background **without the main title or promotional text**
+2. render the final main title and supporting copy with `scripts/render_cover.py`
+3. verify the title layout top anchor equals `0.40 × canvas height`
+
+Do not rely on a generative image model to satisfy an exact 40% coordinate. Direct image-generation typography is only acceptable when the user explicitly asks for all text to be generated inside the image; in that case, placement can only be approximate and must not be described as pixel-exact.
 
 ## Variation dimensions
 
@@ -98,11 +104,11 @@ Vary any combination of:
    - keep colors compatible with the game's palette
 
 6. **Text alignment / horizontal placement**
-   - centered title stack at the 40% vertical anchor
-   - left-aligned title cluster whose top still begins around 40%
+   - centered title stack at the fixed 40% vertical anchor
+   - left-aligned title cluster at the fixed 40% vertical anchor
    - split left/right feature cards below the title
    - centered title with asymmetric supporting badges
-   - horizontally offset title while preserving the same vertical anchor
+   - horizontally offset title while preserving the exact same vertical anchor
 
 7. **Emphasis method**
    - size
@@ -111,6 +117,8 @@ Vary any combination of:
    - shadow
    - panel contrast
    - decorative icon
+
+Vertical main-title placement is **not** a variation dimension.
 
 Do not vary all dimensions randomly. The design should still feel intentional.
 
@@ -125,7 +133,7 @@ For a batch of 4, a good default is:
 
 The four covers should still belong to one series, but should not look like the same text layer pasted over four different backgrounds.
 
-The main title height remains fixed across the whole batch. Variation may move the title left/right or change alignment/treatment, but must keep its top edge around the **40% vertical line** unless the user explicitly requests another height.
+The main title's layout top coordinate remains exactly `0.40 × canvas height` across the whole batch. Variation may move the title left/right or change alignment/treatment, but must not change its vertical anchor unless the user explicitly requests another height.
 
 ## Known-game identity rule
 
@@ -162,7 +170,7 @@ Instead rotate the text system while preserving the game's playful identity:
 3. pink/blue two-tone title + yellow corner sticker + blue version/menu chip
 4. cleaner white title + colored shadow + several small pastel stickers instead of one giant feature bar
 
-For `9:16`, keep the tag near 9–11% height and keep all four main titles anchored around **40%**. Do not pack the whole typography stack against the top edge.
+For `9:16`, keep the tag near 9–11% height and keep all four main-title layout anchors at exactly **40%**. Do not pack the typography stack against the top edge.
 
 If no `accent` is supplied, do **not** invent or duplicate a bottom CTA just to fill space. Let the artwork breathe.
 
@@ -178,7 +186,7 @@ Do not:
 - split a version number incorrectly
 - invent an extra slogan, rating, download count, platform, or feature
 
-If image generation cannot reliably spell important text, generate clean artwork/background and use deterministic text rendering afterward.
+If exact copy matters, generate clean artwork/background and use deterministic text rendering afterward.
 
 ## Quality gate
 
@@ -186,10 +194,12 @@ Before returning a multi-cover batch, verify:
 
 - the text content is exact on every cover
 - no title, tag, badge, outline, shadow, or panel is clipped by the top/left/right canvas edge
-- the main title starts around the intended **40% vertical position** on every cover
-- the title's first visible pixels normally remain within about **38–42%** unless the user explicitly requests another height
-- batch variation changes styling/horizontal placement without raising the title
+- the main title layout top anchor equals exactly `0.40 × canvas height` on every default-layout cover
+- glyph/stroke/shadow pixels may extend around the anchor, but no layout rule has moved the title vertically
+- batch variation changes styling/horizontal placement without changing title height
+- top-tag height does not push the main title down
 - the upper portion of the cover remains available for artwork/background and the small top tag
+- deterministic text rendering is used whenever exact 40% placement is required
 - neighboring covers do not reuse the same title fill + tag shape + feature-card colors + CTA treatment
 - title remains readable at thumbnail size
 - text colors fit the game's actual art direction
