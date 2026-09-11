@@ -184,10 +184,10 @@ def text_size(draw, text, font, stroke=0):
 def top_safe_layout(w, h):
     ratio = h / max(w, 1)
     if ratio >= 1.55:
-        return 0.09, 0.40
+        return 0.09, 0.35
     if h > w:
-        return 0.06, 0.40
-    return 0.04, 0.40
+        return 0.06, 0.35
+    return 0.04, 0.35
 
 
 def add_readability_layers(img, genre):
@@ -269,7 +269,8 @@ def draw_title(draw, title, font_path, w, h, theme, start_y=None):
     stroke = max(7, int(w*.012))
     font = fit_font(draw, lines, font_path, int(w*.92),
                     int(w*.145), int(w*.072), stroke)
-    # The title anchor is intentionally fixed at exactly 40% of canvas height.
+    # The title anchor is intentionally fixed at exactly 35% of canvas height.
+    # On a 1080x1920 9:16 canvas this is y=672, matching the user's CapCut target near y=670.
     # start_y is kept for backward compatibility but must never move the title.
     y = int(h*title_safe)
     for line in lines:
