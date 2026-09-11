@@ -21,6 +21,7 @@ When requested count >= 2:
 - vary at least 3 text-design dimensions between neighboring covers
 - do not force every text element to use the same color family
 - do not force a large bottom banner when the user did not supply an accent/CTA
+- keep the main title's **vertical top anchor fixed around 40% of canvas height** across all batch members
 
 If the user explicitly asks for a unified series identity, keep a shared design system but still allow subtle variation in badge placement, panel shape, or emphasis color.
 
@@ -28,29 +29,32 @@ If the user explicitly asks for a unified series identity, keep a shared design 
 
 **Text visibility overrides decorative placement and batch variation.** Never push title/tag text toward the top edge just to create a different composition.
 
-For portrait covers, especially `9:16`, reserve a larger top safe area because feed previews and platform UI may visually crop or cover the extreme top of the image.
+The main title follows a fixed vertical-anchor rule unless the user explicitly overrides it.
 
 Default safe-area rules:
 
-- `9:16`: no essential glyph, outline, shadow, sticker, or text panel may enter the top **9%** of the canvas
-- `9:16`: the main game title should normally begin around **16–19%** of canvas height; do not place its first visible pixel above **15%**
-- `9:16`: when a top tag exists, place the tag around **9–11%** height, then leave a clear visual gap before the title; prefer lowering the title rather than compressing the gap
-- `4:5` / `3:4`: keep essential text below the top **6%**; main title should normally begin around **11–14%**
-- square / landscape: keep at least **4%** top breathing room unless the user explicitly requests edge-aligned typography
+- **All ratios:** the main game title should begin at approximately **40% of canvas height from the top**
+- **All ratios:** treat `y = 0.40 × canvas height` as the default top anchor for the first title line
+- allow only small optical correction for stroke/shadow, normally within about **38–42%** of canvas height
+- do not move the title above **38%** merely to fit more supporting copy or to create batch variation
+- `9:16`: no essential top tag, outline, shadow, sticker, or text panel may enter the top **9%** of the canvas
+- `9:16`: when a top tag exists, place the tag around **9–11%** height; the large artwork gap between the tag and the 40% title anchor is intentional
+- `4:5` / `3:4`: keep top tags and auxiliary top labels below the top **6%** unsafe zone, while the main title still remains anchored around 40%
+- square / landscape: keep at least **4%** top breathing room for any auxiliary top label, while the main title still remains anchored around 40%
 - keep left/right text edges at least **4–5%** inside the canvas, including stroke, shadow, and panel decoration
-- if a top tag exists, place it inside the safe area first, then place the title below it with visible separation; the tag and title must never collide
 - measure the full visible text bounds, including outline, drop shadow, stickers, ribbons, and panels—not only the font baseline
 
 When text is long, resolve overflow in this order:
 
 1. wrap/reflow the title
 2. reduce font size slightly
-3. move lower within the safe composition area
-4. simplify decorative panels
+3. tighten title line spacing if needed
+4. move supporting feature/version copy lower
+5. simplify decorative panels
 
-Do **not** solve overflow by moving the title upward into the unsafe top band.
+Do **not** solve overflow by moving the title upward from the 40% anchor.
 
-For direct image-generation typography, explicitly describe the title as **fully inside frame, comfortably lower than the top edge, with generous top padding and no cropped letters**. For `9:16`, prefer a visually relaxed upper composition with noticeable sky/background breathing room above the tag. If any letter, outline, shadow, or badge is cut by the canvas edge, treat the cover as failed and regenerate/fix it.
+For direct image-generation typography, explicitly describe the main title as **starting around the 40% vertical position**, fully inside frame, with the upper portion of the image left primarily for artwork/background and any small top tag. If the title drifts high, treat the cover as failed and regenerate/fix it.
 
 ## Variation dimensions
 
@@ -93,12 +97,12 @@ Vary any combination of:
    - e.g. one cover may use pink tag + yellow feature card; another may use blue tag + cream feature card; another may use mint tag + coral feature card
    - keep colors compatible with the game's palette
 
-6. **Text alignment / placement**
-   - centered stack
-   - upper-left title cluster inside the safe area
-   - split left/right feature cards
-   - upper-safe title + feature badges mid-frame
-   - title mid-frame + small top tag
+6. **Text alignment / horizontal placement**
+   - centered title stack at the 40% vertical anchor
+   - left-aligned title cluster whose top still begins around 40%
+   - split left/right feature cards below the title
+   - centered title with asymmetric supporting badges
+   - horizontally offset title while preserving the same vertical anchor
 
 7. **Emphasis method**
    - size
@@ -121,7 +125,7 @@ For a batch of 4, a good default is:
 
 The four covers should still belong to one series, but should not look like the same text layer pasted over four different backgrounds.
 
-Safe-area limits remain fixed across the whole batch. Variation may move the title left/right or lower, but must not move it above the minimum top-safe boundary.
+The main title height remains fixed across the whole batch. Variation may move the title left/right or change alignment/treatment, but must keep its top edge around the **40% vertical line** unless the user explicitly requests another height.
 
 ## Known-game identity rule
 
@@ -158,7 +162,7 @@ Instead rotate the text system while preserving the game's playful identity:
 3. pink/blue two-tone title + yellow corner sticker + blue version/menu chip
 4. cleaner white title + colored shadow + several small pastel stickers instead of one giant feature bar
 
-For `9:16`, keep all four variants comfortably below the top safe boundary even when the title treatment changes. Prefer the tag near 9–11% height and the title around 16–19% rather than packing the whole text stack against the top edge.
+For `9:16`, keep the tag near 9–11% height and keep all four main titles anchored around **40%**. Do not pack the whole typography stack against the top edge.
 
 If no `accent` is supplied, do **not** invent or duplicate a bottom CTA just to fill space. Let the artwork breathe.
 
@@ -182,8 +186,10 @@ Before returning a multi-cover batch, verify:
 
 - the text content is exact on every cover
 - no title, tag, badge, outline, shadow, or panel is clipped by the top/left/right canvas edge
-- on `9:16`, essential text stays below the top 9% unsafe band and the main title starts around the intended 16–19% upper-safe zone
-- the upper edge has visible breathing room rather than looking text-heavy or cramped
+- the main title starts around the intended **40% vertical position** on every cover
+- the title's first visible pixels normally remain within about **38–42%** unless the user explicitly requests another height
+- batch variation changes styling/horizontal placement without raising the title
+- the upper portion of the cover remains available for artwork/background and the small top tag
 - neighboring covers do not reuse the same title fill + tag shape + feature-card colors + CTA treatment
 - title remains readable at thumbnail size
 - text colors fit the game's actual art direction
