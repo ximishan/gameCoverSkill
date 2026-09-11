@@ -12,6 +12,8 @@ When requested count >= 2, automatically enable **diversity mode**.
 
 **Hard title-height constraint:** batch diversity never includes vertical title-height variation. Unless the user explicitly requests another height, every cover keeps the main title's layout top anchor at exactly `y = 0.35 × canvas height`. On a 1080×1920 `9:16` canvas this is about `Y=672`, matching a CapCut target around `Y=670`. Font glyphs, stroke, and shadow may visually extend a few pixels around the anchor, but the layout coordinate itself does not move. Vary title styling, width, horizontal alignment, panels, colors, and supporting badges instead of moving the title upward or downward.
 
+**Fixed swipe-cue constraint:** every default batch member must include the exact literal text **`佑滑自取`** around `y ≈ 0.75 × canvas height`, styled as large bold white text with a thick black outline/shadow and followed by a large red arrow pointing right with a black outline. Do not autocorrect `佑` to `右`. Do not remove, flip, or vertically vary this cue as part of batch diversity.
+
 Before generating images, build a variation plan with one row per image. Each row must differ on at least 4 of these dimensions:
 
 1. Primary subject
@@ -27,7 +29,7 @@ Before generating images, build a variation plan with one row per image. Each ro
 
 Tiny prop swaps do not count.
 
-In addition, vary at least 3 text-design dimensions between neighboring covers, such as title treatment, tag shape, feature-card treatment, version-badge placement, color-role assignment, or **horizontal** text alignment. Do not vary the main title's vertical top anchor.
+In addition, vary at least 3 text-design dimensions between neighboring covers, such as title treatment, tag shape, feature-card treatment, version-badge placement, color-role assignment, or **horizontal** text alignment. Do not vary the main title's vertical top anchor or the fixed swipe cue's ~75% vertical position.
 
 ## Identity lock
 
@@ -75,7 +77,7 @@ Bad batch:
 - same rainbow title
 - same yellow feature strip
 - same green menu/version badge
-- same red bottom CTA
+- same optional bottom banner
 - only the background changes
 
 Good batch:
@@ -88,6 +90,8 @@ Good batch:
 - one cleaner cover with fewer filled panels if the user did not request an accent
 
 The title can look different, but its layout top coordinate remains exactly `0.35 × canvas height` on every cover.
+
+The fixed `佑滑自取` + right-arrow cue is deliberately consistent across the batch and is exempt from the anti-copy-paste requirement.
 
 If the user explicitly asks for a unified series template, keep stronger consistency; otherwise default to visible text-layer variation in batches.
 
@@ -121,7 +125,9 @@ If covers for the same title were already generated earlier in the conversation,
 - title treatment
 - tag shape/color
 - feature-card arrangement
-- accent/banner treatment
+- optional accent/banner treatment
+
+Do not vary or remove the fixed `佑滑自取` + right-arrow cue.
 
 But do not intentionally drift away from the real game's art style just to appear different.
 
@@ -193,5 +199,7 @@ Before returning a batch, verify:
 - previous AI-generated covers were not accidentally used as the main identity reference
 - text content is identical to the supplied copy unless the user requested copy changes
 - every main title layout top anchor equals exactly `0.35 × canvas height`, unless the user explicitly overrides the title height
+- every default cover contains exact `佑滑自取` around ~75% with a right-pointing red arrow and black outline
+- no cover autocorrects `佑滑自取` to `右滑自取`
 - neighboring covers do not reuse the same title treatment + tag shape + feature-card arrangement + color-role mapping
-- if the user did not supply an accent/CTA, no extra bottom banner is invented merely for symmetry
+- if the user did not supply an accent, no extra optional bottom banner is invented merely for symmetry; the fixed swipe cue remains present
