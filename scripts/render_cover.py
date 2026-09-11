@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 from pathlib import Path
-from typing import List, Tuple
 
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont
 
@@ -36,6 +35,10 @@ FONT_CANDIDATES = [
 WHITE = (255, 255, 255, 255)
 BLACK = (0, 0, 0, 255)
 RED = (245, 38, 38, 255)
+CYAN = (55, 218, 255, 255)
+YELLOW = (255, 220, 48, 255)
+ORANGE = (255, 142, 32, 255)
+PINK = (238, 72, 164, 255)
 
 # panel_shape, tag, panel_a, panel_b, accent, shadow, version, stroke,
 # brightness, contrast, saturation
@@ -73,15 +76,12 @@ THEMES = {
               (255,91,179,255), (73,211,255,255), (73,84,170,240), BLACK, .92, 1.10, 1.22),
 }
 
-# Specific families must come before broad ones.
 KEYWORDS = {
     "grand-strategy": [
         "grand strategy", "grand-strategy", "大战略", "宏大战略",
-        "欧陆风云", "europa universalis",
-        "钢铁雄心", "hearts of iron",
-        "十字军之王", "crusader kings",
-        "维多利亚3", "维多利亚 3", "victoria 3",
-        "群星", "stellaris",
+        "欧陆风云", "europa universalis", "钢铁雄心", "hearts of iron",
+        "十字军之王", "crusader kings", "维多利亚3", "维多利亚 3",
+        "victoria 3", "群星", "stellaris",
     ],
     "roguelike": ["roguelike", "肉鸽", "地牢", "重生细胞", "dead cells", "哈迪斯", "hades"],
     "shooter": ["射击", "fps", "tps", "枪战", "火力掩护", "cover fire", "使命召唤", "战地"],
@@ -170,7 +170,8 @@ def fit_font(draw, lines, font_path, max_width, start_size, min_size, stroke):
     size = start_size
     while size >= min_size:
         font = ImageFont.truetype(font_path, size=size)
-        widths = [draw.textbbox((0, 0), line, font=font, stroke_width=stroke)[2] for line in (lines or [" "])]
+        widths = [draw.textbbox((0, 0), line, font=font, stroke_width=stroke)[2]
+                  for line in (lines or [" "])]
         if max(widths) <= max_width:
             return font
         size -= 4
@@ -270,9 +271,6 @@ def draw_title(draw, title, font_path, w, h, theme, start_y=None):
     stroke = max(7, int(w*.012))
     font = fit_font(draw, lines, font_path, int(w*.92),
                     int(w*.145), int(w*.072), stroke)
-    # The title anchor is intentionally fixed at exactly 35% of canvas height.
-    # On a 1080x1920 9:16 canvas this is y=672, matching the user's CapCut target near y=670.
-    # start_y is kept for backward compatibility but must never move the title.
     y = int(h*title_safe)
     for line in lines:
         tw, th = text_size(draw, line, font, stroke)
@@ -322,10 +320,87 @@ def draw_features(draw, features, version, font_path, w, h, start_y, theme):
                   stroke_width=stroke, stroke_fill=stroke_color)
 
 
-def draw_swipe_cta(draw, font_path, w, h):
-    """Draw the fixed reference-style '佑滑自取' cue at 75% canvas height."""
+def _rgb(color):
+    return tuple(int(v) for v in color[:3])
+
+
+def _relative_luminance(color):
+    channels = []
+    for value in _rgb(color):
+        c = value / 255.0
+        channels.append(c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4)
+    return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]
+
+
+def _contrast_ratio(a, b):
+    la, lb = _relative_luminance(a), _relative_luminance(b)
+    lighter, darker = max(la, lb), min(la, lb)
+    return (lighter + 0.05) / (darker + 0.05)
+
+
+def _color_distance(a, b):
+    ar, ag, ab = _rgb(a)
+    br, bg, bb = _rgb(b)
+    return ((ar-br)**2 + (ag-bg)**2 + (ab-bb)**2) ** 0.5
+
+
+def _opaque(color):
+    r, g, b = _rgb(color)
+    return (r, g, b, 255)
+
+
+def _sample_swipe_background(img, w, h):
+    x1, x2 = int(w * .04), int(w * .96)
+    y1, y2 = int(h * .70), int(h * .80)
+    crop = img.crop((x1, y1, x2, y2)).convert("RGB")
+    return crop.resize((1, 1), Image.Resampling.BOX).getpixel((0, 0))
+
+
+def _pick_dynamic_color(candidates, bg, avoid=None):
+    seen = set()
+    ranked = []
+    for candidate in candidates:
+        color = _opaque(candidate)
+        rgb = _rgb(color)
+        if rgb in seen:
+            continue
+        seen.add(rgb)
+        score = _contrast_ratio(color, bg)
+        if avoid is not None:
+            score += min(_color_distance(color, avoid) / 255.0, 1.0) * 0.75
+            if _color_distance(color, avoid) < 70:
+                score -= 1.25
+        ranked.append((score, color))
+    ranked.sort(key=lambda item: item[0], reverse=True)
+    return ranked[0][1] if ranked else WHITE
+
+
+def _adaptive_outline(fill, bg):
+    black_score = min(_contrast_ratio(BLACK, fill), _contrast_ratio(BLACK, bg))
+    white_score = min(_contrast_ratio(WHITE, fill), _contrast_ratio(WHITE, bg))
+    return BLACK if black_score >= white_score else WHITE
+
+
+def draw_swipe_cta(draw, img, font_path, w, h, theme):
+    """Draw fixed '佑滑自取' at 75%; colors adapt to theme and local background."""
     text = "佑滑自取"
     center_y = int(h * .75)
+
+    _, tag_color, panel_a, panel_b, accent, shadow, version_color, _, *_ = theme
+    bg = _sample_swipe_background(img, w, h)
+
+    text_fill = _pick_dynamic_color(
+        [accent, version_color, tag_color, WHITE, YELLOW, CYAN, panel_a, panel_b],
+        bg,
+    )
+    arrow_fill = _pick_dynamic_color(
+        [tag_color, accent, version_color, RED, ORANGE, CYAN, PINK, panel_b],
+        bg,
+        avoid=text_fill,
+    )
+    text_outline = _adaptive_outline(text_fill, bg)
+    arrow_outline = _adaptive_outline(arrow_fill, bg)
+
     stroke = max(7, int(w * .010))
     font = fit_font(draw, [text], font_path, int(w * .46),
                     int(w * .105), int(w * .070), stroke)
@@ -338,10 +413,12 @@ def draw_swipe_cta(draw, font_path, w, h):
     y = int(center_y - th / 2)
 
     shadow_offset = max(3, int(w * .004))
+    shadow_fill = _opaque(shadow)
     draw.text((x + shadow_offset, y + shadow_offset), text,
-              font=font, fill=BLACK, stroke_width=stroke + 2, stroke_fill=BLACK)
-    draw.text((x, y), text, font=font, fill=WHITE,
-              stroke_width=stroke, stroke_fill=BLACK)
+              font=font, fill=shadow_fill,
+              stroke_width=stroke + 2, stroke_fill=text_outline)
+    draw.text((x, y), text, font=font, fill=text_fill,
+              stroke_width=stroke, stroke_fill=text_outline)
 
     arrow_x = x + tw + gap
     arrow_end = min(w - int(w * .045), arrow_x + arrow_len)
@@ -370,8 +447,14 @@ def draw_swipe_cta(draw, font_path, w, h):
         (head_base, body_bottom),
         (arrow_x, body_bottom),
     ]
-    draw.polygon(outer, fill=BLACK)
-    draw.polygon(inner, fill=RED)
+    draw.polygon(outer, fill=arrow_outline)
+    draw.polygon(inner, fill=arrow_fill)
+
+    return {
+        "background": _rgb(bg),
+        "text": _rgb(text_fill),
+        "arrow": _rgb(arrow_fill),
+    }
 
 
 def draw_bottom_accent(draw, text, font_path, w, h, theme):
@@ -422,7 +505,7 @@ def render(input_path, output_path, title, tag, features, version, accent,
                            tag_end + int(h*.025))
     draw_features(draw, features, version, font_path, w, h,
                   title_end + int(h*.025), theme)
-    draw_swipe_cta(draw, font_path, w, h)
+    swipe_colors = draw_swipe_cta(draw, img, font_path, w, h, theme)
     draw_bottom_accent(draw, accent, font_path, w, h, theme)
 
     out = Path(output_path)
@@ -431,7 +514,13 @@ def render(input_path, output_path, title, tag, features, version, accent,
         img.convert("RGB").save(out, quality=95, optimize=True)
     else:
         img.save(out, optimize=True)
+
     print(f"genre={genre}")
+    print(
+        "swipe_colors="
+        f"text{swipe_colors['text']},arrow{swipe_colors['arrow']},"
+        f"background{swipe_colors['background']}"
+    )
     print(str(out.resolve()))
 
 
