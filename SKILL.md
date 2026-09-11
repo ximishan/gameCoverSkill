@@ -37,7 +37,7 @@ The user's explicit wording, target size, supplied references, genre/style overr
    - Build one distinct visual concept per requested image.
    - Vary scene, subject, camera, activity, composition, and visual anchor while keeping the same game's visual language locked.
    - Also vary the text system between batch members: title treatment, tag shape, feature-card arrangement, color-role assignment, version placement, and accent treatment.
-   - Keep the main title's vertical top anchor fixed at about **40% of canvas height** across the batch; diversity may change horizontal alignment and styling, not raise the title.
+   - **Never vary the main title vertically.** Unless the user explicitly asks for another height, its layout top anchor is exactly `y = 0.40 × canvas height` on every batch member.
    - Do not generate four near-identical faces, and do not paste the exact same text layer over four different backgrounds.
    - Do not create variety by changing the wording.
 
@@ -45,19 +45,20 @@ The user's explicit wording, target size, supplied references, genre/style overr
    - Use supplied screenshot/poster/key art when suitable.
    - For known games, preserve recognizable character proportions, rendering style, environment language, and major world motifs.
    - If generating a fresh scene, create a new composition rather than reproducing an official cover exactly.
-   - When the deterministic text-render workflow is available, generated artwork should contain no title, no platform logo, no UI label, no watermark, and no promotional copy.
-   - Leave usable negative space for title, feature blocks, version badge, and accent/CTA.
+   - **Default production path:** image generation creates artwork/background only. Do not ask the image model to draw the main game title, platform logo, UI label, watermark, or promotional copy when deterministic overlay rendering is available.
+   - Leave usable negative space around the fixed title band and for feature blocks, version badge, and optional accent/CTA.
 
-5. **Render exact copy inside the text-safe area**
+5. **Render exact copy at the fixed title coordinate**
    - Game names, DLC wording, version numbers, Chinese text, platform labels, and user-provided marketing wording must remain exact.
-   - Apply the text-safe placement rules in `references/typography_variation.md` for **every cover**, including count = 1.
-   - **Hard title-position rule:** unless the user explicitly overrides it, the main game title must begin at approximately **40% of the canvas height from the top**. Treat `y = 0.40 × canvas height` as the default title top anchor for every preset and every batch member.
-   - For `9:16`, keep the top tag around **9–11%** of canvas height, but leave the large artwork area between the tag and title intentionally open. Do not pull the title upward to close that gap.
-   - The title's first visible pixel should normally stay around the **40% vertical line**; allow only small optical correction of about ±2 percentage points for outlines/shadows. Do not move the title above **38%** unless the user explicitly requests a higher title layout.
-   - Never let a title, tag, badge, outline, shadow, sticker, or panel touch/cross the canvas edge.
-   - If copy is long, wrap it, reduce font size, tighten line spacing, move supporting copy lower, or simplify decoration before ever moving the title upward from the 40% anchor.
-   - Prefer deterministic rendering with `scripts/render_cover.py` when exact text is critical.
-   - If text is rendered directly by image generation, explicitly require the main title to start around the **40% vertical position**, fully inside frame, with the upper 35–40% of the cover left mainly for artwork/background and the small top tag.
+   - Apply `references/typography_variation.md` for **every cover**, including count = 1.
+   - **Hard title-position rule:** unless the user explicitly overrides title height, the main game title's layout top anchor is **exactly 40% of canvas height from the top**. Use `y = 0.40 × canvas height` for every preset, genre, and batch member.
+   - This is a layout-coordinate rule, not a loose visual suggestion. Do not substitute 38%, 42%, or another nearby title coordinate.
+   - Font metrics, antialiasing, outline, or shadow can visually extend a few pixels around that coordinate, but they must not change the title layout anchor.
+   - For `9:16`, keep the top tag around **9–11%** of canvas height. The large artwork area between that tag and the 40% title anchor is intentional; never pull the title upward to close the gap.
+   - Tag height must not push the title down either. The title anchor is independent of the tag and supporting copy.
+   - If copy is long, wrap it, reduce font size, tighten line spacing, move feature/version copy lower, or simplify decoration. **Never solve overflow by changing the title's 40% vertical anchor.**
+   - Use `scripts/render_cover.py` for the final main title whenever the user expects fixed positioning or exact copy. This deterministic text pass is the default, not an optional fallback.
+   - Direct image-generation typography is allowed only when the user explicitly asks for all text to be drawn by the image model. In that mode, do not claim pixel-exact 40% placement because generative image models cannot guarantee exact coordinates.
    - Do not normalize or rewrite user copy just because another phrase sounds more natural.
 
 6. **Quality-check every size and every batch member independently**
@@ -65,8 +66,8 @@ The user's explicit wording, target size, supplied references, genre/style overr
    - Never stretch a finished cover into another size.
    - Reject or regenerate near-duplicate batch members.
    - Reject visually attractive covers that no longer resemble the requested game.
-   - Reject any cover where important text is partially outside frame, or where the main title has drifted materially above the 40% anchor without an explicit user request.
-   - Reject batches where the backgrounds vary but all typography, panel shapes, and color assignments are effectively identical unless the user explicitly requested a unified series template.
+   - Reject any default-layout cover where the main title layout anchor is not `0.40 × canvas height`.
+   - Reject batches where background concepts vary but all typography, panel shapes, and color assignments are effectively identical unless the user explicitly requested a unified series template.
 
 ## Game identity preservation
 
@@ -133,7 +134,7 @@ For each cover in a batch, vary at least 4 of:
 - character count
 - camera distance and angle
 - environment/scene category
-- subject position and title composition
+- subject position and composition around the fixed title band
 - secondary visual anchor
 - activity/action
 - lighting/time/weather
@@ -157,10 +158,10 @@ Read `references/typography_variation.md` and vary at least 3 text-design dimens
 - feature-card shape and arrangement
 - version-badge position/style
 - color-role assignment
-- title alignment / horizontal placement; **vertical title anchor remains fixed around 40%**
+- title alignment / horizontal placement
 - accent/CTA treatment
 
-Text-position variation must preserve the fixed title-height rule. A composition may move the title left/right or change alignment, but must not move the main title materially above or below the 40% top anchor unless the user explicitly asks for it.
+**Vertical main-title placement is not a variation dimension.** It remains fixed at exactly 40% unless the user explicitly overrides title height.
 
 Do not use the exact same combination of red top tag + same title fill + yellow feature strip + same green badge + same bottom banner on every cover.
 
@@ -243,7 +244,7 @@ For mainstream audiences, a broad descriptor may be clearer than a technical gen
 Unless the user asks for another arrangement:
 
 1. Top tag: user-supplied `tag`, placed around the upper safe zone rather than near the canvas edge
-2. Giant game title: top edge anchored at approximately **40% of canvas height**
+2. Giant game title: layout top anchor fixed at **exactly 40% of canvas height**
 3. Up to 3 user-supplied feature callouts, flowing below the title
 4. Optional version/menu badge using the exact supplied value
 5. Giant bottom emphasis only when the user supplied an `accent`
@@ -282,8 +283,8 @@ General requirements:
 - enough contrast for supplied text
 - no accidental promotional copy/logos/watermarks when exact overlay rendering is used
 - for multiple covers, change the concept substantially while keeping art-direction identity stable
-- reserve clean negative space around the **38–55% vertical band**, because the main title is anchored at about 40%
-- on `9:16`, preserve visible artwork/sky/background above the top tag and through the upper third; the large gap before the 40% title anchor is intentional and must not be filled by moving the title upward
+- reserve clean negative space around the **38–55% vertical band**, with the actual main-title layout anchor fixed at exactly **40%**
+- on `9:16`, preserve visible artwork/sky/background above the top tag and through the upper third; the large gap before the 40% title anchor is intentional and must not be filled by moving the title
 
 For `grand-strategy`, prioritize maps, borders, flags, monarchs/generals/diplomats, fleets, armies, capitals, parliament/court/war-room objects, parchment, seals, compass/globe elements.
 
@@ -307,9 +308,11 @@ Before returning a cover or batch, verify:
 - marketing descriptors do not create unsupported factual claims
 - no text is clipped
 - no text, outline, shadow, badge, or panel touches the canvas edge
-- the main title begins around **40% of canvas height** on every default layout; its first visible pixels should normally remain within roughly **38–42%** unless the user explicitly requests another title height
+- the main title **layout top anchor equals exactly `0.40 × canvas height`** on every default layout
+- font glyphs, stroke, or shadow may visually extend a few pixels around the anchor, but no layout logic may move the title vertically
 - on `9:16`, the tag may remain around **9–11%**, with intentional open artwork space between the tag and the title
-- batch variation never raises the title to create fake layout diversity
+- batch variation never changes the title's vertical anchor
+- deterministic text overlay is used whenever exact 40% placement is required
 - no important subject is hidden unnecessarily
 - title remains readable at about 250 px preview width
 - every output size was reflowed rather than stretched
