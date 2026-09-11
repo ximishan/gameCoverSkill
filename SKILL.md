@@ -38,6 +38,7 @@ The user's explicit wording, target size, supplied references, genre/style overr
    - Vary scene, subject, camera, activity, composition, and visual anchor while keeping the same game's visual language locked.
    - Also vary the text system between batch members: title treatment, tag shape, feature-card arrangement, color-role assignment, version placement, and accent treatment.
    - **Never vary the main title vertically.** Unless the user explicitly asks for another height, its layout top anchor is exactly `y = 0.35 × canvas height` on every batch member.
+   - **Never remove or vertically vary the fixed swipe cue.** Every default cover keeps `佑滑自取` + a right-pointing red arrow around `y = 0.75 × canvas height`.
    - Do not generate four near-identical faces, and do not paste the exact same text layer over four different backgrounds.
    - Do not create variety by changing the wording.
 
@@ -45,10 +46,10 @@ The user's explicit wording, target size, supplied references, genre/style overr
    - Use supplied screenshot/poster/key art when suitable.
    - For known games, preserve recognizable character proportions, rendering style, environment language, and major world motifs.
    - If generating a fresh scene, create a new composition rather than reproducing an official cover exactly.
-   - **Default production path:** image generation creates artwork/background only. Do not ask the image model to draw the main game title, platform logo, UI label, watermark, or promotional copy when deterministic overlay rendering is available.
-   - Leave usable negative space around the fixed title band and for feature blocks, version badge, and optional accent/CTA.
+   - **Default production path:** image generation creates artwork/background only. Do not ask the image model to draw the main game title, fixed swipe cue, platform logo, UI label, watermark, or promotional copy when deterministic overlay rendering is available.
+   - Leave usable negative space around the fixed title band, for feature blocks/version badge, and around the lower ~75% swipe-cue band.
 
-5. **Render exact copy at the fixed title coordinate**
+5. **Render exact copy at the fixed coordinates**
    - Game names, DLC wording, version numbers, Chinese text, platform labels, and user-provided marketing wording must remain exact.
    - Apply `references/typography_variation.md` for **every cover**, including count = 1.
    - **Hard title-position rule:** unless the user explicitly overrides title height, the main game title's layout top anchor is **exactly 35% of canvas height from the top**. Use `y = 0.35 × canvas height` for every preset, genre, and batch member.
@@ -56,9 +57,14 @@ The user's explicit wording, target size, supplied references, genre/style overr
    - Font metrics, antialiasing, outline, or shadow can visually extend a few pixels around that coordinate, but they must not change the title layout anchor.
    - For `9:16`, keep the top tag around **9–11%** of canvas height. The artwork area between that tag and the 35% title anchor is intentional; never move the title merely to close the gap.
    - Tag height must not push the title down either. The title anchor is independent of the tag and supporting copy.
-   - If copy is long, wrap it, reduce font size, tighten line spacing, move feature/version copy lower, or simplify decoration. **Never solve overflow by changing the title's 35% vertical anchor.**
-   - Use `scripts/render_cover.py` for the final main title whenever the user expects fixed positioning or exact copy. This deterministic text pass is the default, not an optional fallback.
-   - Direct image-generation typography is allowed only when the user explicitly asks for all text to be drawn by the image model. In that mode, do not claim pixel-exact 35% placement because generative image models cannot guarantee exact coordinates.
+   - **Fixed swipe cue rule:** every default cover must contain the exact literal text **`佑滑自取`**. Do not autocorrect `佑` to `右`.
+   - The swipe cue's visual center stays around **75% of canvas height**, `y ≈ 0.75 × canvas height`.
+   - Style the cue like the supplied reference: **very bold white Chinese text, thick black outline/shadow, with a large bright-red arrow pointing right immediately beside it**. Give the arrow a black outer outline for contrast.
+   - On 1080×1920 `9:16`, the swipe cue center is about **Y=1440**. On 1080×1440 `3:4`, it is about **Y=1080**.
+   - The fixed swipe cue is a system element, **not** the optional user `accent`; it remains present even if the user provides no accent.
+   - If copy is long, wrap it, reduce font size, tighten line spacing, reflow feature/version copy above the swipe cue, or simplify decoration. **Never solve overflow by changing the title's 35% anchor or the swipe cue's ~75% position.**
+   - Use `scripts/render_cover.py` for the final title and fixed swipe cue whenever the user expects fixed positioning or exact copy. This deterministic text pass is the default, not an optional fallback.
+   - Direct image-generation typography is allowed only when the user explicitly asks for all text to be drawn by the image model. In that mode, do not claim pixel-exact 35% / 75% placement because generative image models cannot guarantee exact coordinates.
    - Do not normalize or rewrite user copy just because another phrase sounds more natural.
 
 6. **Quality-check every size and every batch member independently**
@@ -67,6 +73,7 @@ The user's explicit wording, target size, supplied references, genre/style overr
    - Reject or regenerate near-duplicate batch members.
    - Reject visually attractive covers that no longer resemble the requested game.
    - Reject any default-layout cover where the main title layout anchor is not `0.35 × canvas height`.
+   - Reject any default-layout cover where `佑滑自取` + the right arrow is missing, has been autocorrected, points left, or has materially drifted away from the ~75% band.
    - Reject batches where background concepts vary but all typography, panel shapes, and color assignments are effectively identical unless the user explicitly requested a unified series template.
 
 ## Game identity preservation
@@ -163,16 +170,19 @@ Read `references/typography_variation.md` and vary at least 3 text-design dimens
 
 **Vertical main-title placement is not a variation dimension.** It remains fixed at exactly 35% unless the user explicitly overrides title height.
 
-Do not use the exact same combination of red top tag + same title fill + yellow feature strip + same green badge + same bottom banner on every cover.
+**The fixed `佑滑自取` + red right-arrow cue is not a variation dimension either.** Keep its wording, direction, reference-style treatment, and ~75% vertical position stable across the batch.
+
+Do not use the exact same combination of red top tag + same title fill + yellow feature strip + same green badge + same optional bottom banner on every cover.
 
 Keep the design coherent with the real game palette. Diversity does not mean random colors.
 
-If the user did not supply `accent`, do not invent a large bottom CTA just to fill the layout. A cleaner cover with more visible artwork is allowed and often desirable.
+If the user did not supply `accent`, do not invent a separate large bottom CTA just to fill the layout. The fixed `佑滑自取` cue remains present regardless.
 
 Exact-copy examples:
 
 - `无广版` must not silently become `无广告版`
 - `自带菜单` must not silently become `内置菜单`
+- fixed `佑滑自取` must not be changed to `右滑自取`
 - version numbers must remain unchanged
 
 ## Automatic genre routing
@@ -245,11 +255,12 @@ Unless the user asks for another arrangement:
 
 1. Top tag: user-supplied `tag`, placed around the upper safe zone rather than near the canvas edge
 2. Giant game title: layout top anchor fixed at **exactly 35% of canvas height**
-3. Up to 3 user-supplied feature callouts, flowing below the title
+3. Up to 3 user-supplied feature callouts, flowing below the title and preferably above the fixed lower cue
 4. Optional version/menu badge using the exact supplied value
-5. Giant bottom emphasis only when the user supplied an `accent`
+5. Fixed lower cue at about **75% canvas height**: **`佑滑自取`** in bold white + thick black outline/shadow, followed by a **red right-pointing arrow with black outline**
+6. Optional giant bottom emphasis only when the user supplied an `accent`
 
-Use only claims provided by the user or clearly supported by supplied context. Do not invent DLC status, unlocked content, save status, MOD functions, version numbers, platform availability, ratings, download counts, slogans, or offline-only claims.
+Use only claims provided by the user or clearly supported by supplied context. Do not invent DLC status, unlocked content, save status, MOD functions, version numbers, platform availability, ratings, download counts, slogans, or offline-only claims. The fixed `佑滑自取` cue is the one default system CTA and is not treated as an invented claim.
 
 ## Output sizes
 
@@ -284,6 +295,7 @@ General requirements:
 - no accidental promotional copy/logos/watermarks when exact overlay rendering is used
 - for multiple covers, change the concept substantially while keeping art-direction identity stable
 - reserve clean negative space around the **33–50% vertical band**, with the actual main-title layout anchor fixed at exactly **35%**
+- reserve enough visual contrast around the **72–78% vertical band** for the fixed `佑滑自取` + right-arrow cue
 - on `9:16`, preserve visible artwork/sky/background above the top tag and through the upper third; the gap before the 35% title anchor is intentional and must not be filled by moving the title
 
 For `grand-strategy`, prioritize maps, borders, flags, monarchs/generals/diplomats, fleets, armies, capitals, parliament/court/war-room objects, parchment, seals, compass/globe elements.
@@ -304,15 +316,19 @@ Before returning a cover or batch, verify:
 - characters look like they belong to that game rather than a generic substitute
 - background props/environments match the game's visual world
 - exact Chinese wording matches the user's copy
-- game name, version/menu text, feature text, tag, and accent are unchanged
+- game name, version/menu text, feature text, tag, optional accent, and fixed `佑滑自取` wording are unchanged
 - marketing descriptors do not create unsupported factual claims
 - no text is clipped
-- no text, outline, shadow, badge, or panel touches the canvas edge
+- no text, outline, shadow, badge, arrow, or panel touches the canvas edge
 - the main title **layout top anchor equals exactly `0.35 × canvas height`** on every default layout
 - font glyphs, stroke, or shadow may visually extend a few pixels around the anchor, but no layout logic may move the title vertically
+- the fixed **`佑滑自取` + red right arrow** is present around `0.75 × canvas height`
+- `佑滑自取` has not been autocorrected to `右滑自取`
+- the right arrow actually points right and remains clearly visible against the artwork
+- feature/version copy does not collide with the fixed swipe cue
 - on `9:16`, the tag may remain around **9–11%**, with intentional open artwork space between the tag and the title
-- batch variation never changes the title's vertical anchor
-- deterministic text overlay is used whenever exact 35% placement is required
+- batch variation never changes the title's vertical anchor or removes/moves the fixed swipe cue
+- deterministic text overlay is used whenever exact 35% / 75% placement is required
 - no important subject is hidden unnecessarily
 - title remains readable at about 250 px preview width
 - every output size was reflowed rather than stretched
@@ -320,6 +336,6 @@ Before returning a cover or batch, verify:
 - multi-image batches still look like the same game
 - multi-image batches do not reuse the exact same typography/panel/color system by default
 - previous AI-generated same-game outputs were not accidentally used as the main identity reference
-- no bottom accent/CTA or extra slogan was invented when the user did not provide one
+- no optional bottom accent/banner or extra slogan was invented when the user did not provide one; the fixed swipe cue is the intended default lower CTA
 
 Return the generated image file(s) directly. Keep commentary short unless the user asks for design analysis.
