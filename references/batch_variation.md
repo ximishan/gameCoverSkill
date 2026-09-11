@@ -10,7 +10,7 @@ Also read `references/typography_variation.md`. Scene diversity and text-layer d
 
 When requested count >= 2, automatically enable **diversity mode**.
 
-**Hard title-height constraint:** batch diversity never includes vertical title-height variation. Unless the user explicitly requests another height, every cover keeps the main title's top anchor at approximately **40% of canvas height**. Normal optical correction is limited to about **38–42%**. Vary title styling, width, horizontal alignment, panels, colors, and supporting badges instead of moving the title upward or downward.
+**Hard title-height constraint:** batch diversity never includes vertical title-height variation. Unless the user explicitly requests another height, every cover keeps the main title's layout top anchor at exactly `y = 0.40 × canvas height`. Do not apply 38%–42% optical layout corrections. Font glyphs, stroke, and shadow may visually extend a few pixels around the anchor, but the layout coordinate itself does not move. Vary title styling, width, horizontal alignment, panels, colors, and supporting badges instead of moving the title upward or downward.
 
 Before generating images, build a variation plan with one row per image. Each row must differ on at least 4 of these dimensions:
 
@@ -87,7 +87,7 @@ Good batch:
 - different version-badge placement
 - one cleaner cover with fewer filled panels if the user did not request an accent
 
-The title can look different, but its top edge should still sit around the same **40% vertical line** on every cover.
+The title can look different, but its layout top coordinate remains exactly `0.40 × canvas height` on every cover.
 
 If the user explicitly asks for a unified series template, keep stronger consistency; otherwise default to visible text-layer variation in batches.
 
@@ -103,7 +103,7 @@ For known commercial games, identity should come from:
 
 1. user-supplied game screenshot/art
 2. official/publisher/store screenshots when available
-3. reliable gameplay references
+3. reliable gameplay screenshots
 4. textual reconstruction only as fallback
 
 Only reuse a previous AI-generated cover as a positive reference when the user explicitly asks to preserve that generated character/design or edit that exact image.
@@ -116,7 +116,7 @@ If covers for the same title were already generated earlier in the conversation,
 - camera angle
 - main environment
 - dominant visual anchor
-- title treatment / horizontal alignment, while keeping the vertical top anchor fixed around 40%
+- title treatment / horizontal alignment, while keeping the vertical top anchor fixed at exactly 40%
 - activity
 - title treatment
 - tag shape/color
@@ -192,6 +192,6 @@ Before returning a batch, verify:
 - for 4+ covers, prefer at least one environment/map/multi-scene composition where appropriate
 - previous AI-generated covers were not accidentally used as the main identity reference
 - text content is identical to the supplied copy unless the user requested copy changes
-- every main title begins around **40% of canvas height**, normally within roughly **38–42%**, unless the user explicitly overrides the title height
+- every main title layout top anchor equals exactly `0.40 × canvas height`, unless the user explicitly overrides the title height
 - neighboring covers do not reuse the same title treatment + tag shape + feature-card arrangement + color-role mapping
 - if the user did not supply an accent/CTA, no extra bottom banner is invented merely for symmetry
