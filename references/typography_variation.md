@@ -23,6 +23,7 @@ When requested count >= 2:
 - do not force a large bottom banner when the user did not supply an accent/CTA
 - keep the main title's **layout top anchor fixed at exactly 35% of canvas height** across all batch members
 - keep the fixed swipe cue **“佑滑自取” + right arrow** at the same ~75% vertical position on every cover
+- allow the swipe-cue text color, arrow color, and black/white outline choice to adapt per image so the cue matches the game palette and remains readable over the local background
 
 If the user explicitly asks for a unified series identity, keep a shared design system but still allow subtle variation in badge placement, panel shape, or emphasis color.
 
@@ -62,13 +63,20 @@ Hard rules:
 - the literal text is **`佑滑自取`**
 - preserve those four characters exactly; **do not autocorrect `佑` to `右`**
 - the cue's visual center sits at approximately `y = 0.75 × canvas height`
-- the text uses **very bold white characters with a thick black outline and black drop shadow**, similar to the reference image
-- a **large bright red arrow pointing right** sits immediately to the right of the text
-- the arrow also has a black outer outline so it remains visible over busy game footage/artwork
+- use a very bold, high-impact Chinese type treatment with a thick outline/shadow, similar in weight to the supplied reference
+- a large arrow pointing **right** sits immediately to the right of the text
+- **do not lock the cue to white text + red arrow**
+- choose the text color dynamically from the current genre/theme palette plus a small high-contrast fallback palette
+- choose the arrow color separately from the same design family, preferring a color that contrasts with the local background **and** is visibly distinct from the text color
+- sample the actual artwork around the `70–80%` vertical band before choosing colors, so bright and dark covers can produce different cue colors
+- choose the text and arrow outlines adaptively between black and white so the fills stay readable against the local artwork
+- on a dark local background, prefer bright/light fills such as white, yellow, cyan, warm gold, or another theme-compatible bright accent
+- on a bright local background, permit darker theme colors such as navy, charcoal, deep teal, burgundy, or another compatible dark accent
+- color adaptation should be deterministic and design-driven, not random decoration
 - keep the cue fully inside the canvas with comfortable left/right margins
 - the cue is a fixed system element, not a user-supplied `accent`
 - if the user does not provide an `accent`, omit the optional large bottom accent panel but **still keep `佑滑自取` + the right arrow**
-- batch diversity may not remove this cue, change its wording, flip the arrow, or materially change its ~75% vertical position
+- batch diversity may not remove this cue, change its wording, flip the arrow, or materially change its ~75% vertical position; its colors may adapt independently for each cover
 
 For a 1080×1920 `9:16` canvas, the cue center is around **Y=1440**. For a 1080×1440 `3:4` canvas, the cue center is around **Y=1080**.
 
@@ -82,6 +90,7 @@ When the user expects exact title placement, exact Chinese copy, or the fixed sw
 2. render the final main title, supporting copy, and fixed swipe cue with `scripts/render_cover.py`
 3. verify the title layout top anchor equals `0.35 × canvas height`
 4. verify the `佑滑自取` cue is centered around `0.75 × canvas height` and points right
+5. verify the renderer sampled the lower cue band and selected readable theme-compatible text/arrow colors
 
 Do not rely on a generative image model to satisfy exact 35% / 75% coordinates. Direct image-generation typography is only acceptable when the user explicitly asks for all text to be generated inside the image; in that case, placement can only be approximate and must not be described as pixel-exact.
 
@@ -141,7 +150,7 @@ Vary any combination of:
    - panel contrast
    - decorative icon
 
-Vertical main-title placement and the fixed `佑滑自取` cue are **not** variation dimensions.
+Vertical main-title placement and the fixed swipe cue's wording/direction/vertical position are **not** variation dimensions. The swipe cue's **colors are adaptive properties** and may differ per cover according to theme/background.
 
 Do not vary all dimensions randomly. The design should still feel intentional.
 
@@ -158,7 +167,7 @@ The four covers should still belong to one series, but should not look like the 
 
 The main title's layout top coordinate remains exactly `0.35 × canvas height` across the whole batch. Variation may move the title left/right or change alignment/treatment, but must not change its vertical anchor unless the user explicitly requests another height.
 
-The fixed `佑滑自取` + right-arrow cue stays at approximately `0.75 × canvas height` on every batch member.
+The fixed `佑滑自取` + right-arrow cue stays at approximately `0.75 × canvas height` on every batch member, while its text/arrow/outline colors are recalculated for each image.
 
 ## Known-game identity rule
 
@@ -191,13 +200,13 @@ For four `米加小镇` covers, do not use this exact overlay four times:
 Instead rotate the text system while preserving the game's playful identity:
 
 1. rainbow title + pink tag + cream/yellow feature strip
-2. white title with pink/blue outline + mint tag + small peach feature cards
-3. pink/blue two-tone title + yellow corner sticker + blue version/menu chip
-4. cleaner white title + colored shadow + several small pastel stickers instead of one giant feature bar
+2. white title with pink/blue outline + mint tag + peach feature card
+3. pink-blue two-tone title + yellow corner tag + blue version/menu chip
+4. clean white title with colored shadow + small pastel stickers and more visible artwork
 
 For `9:16`, keep the tag near 9–11% height and keep all four main-title layout anchors at exactly **35%**. Do not pack the typography stack against the top edge.
 
-On every cover, retain the fixed `佑滑自取` + red right-arrow cue around 75% height.
+On every cover, retain the fixed `佑滑自取` + right-arrow cue around 75% height, but let the cue colors adapt to each cover. A pink/mint life-sim cover does not need the same arrow color as a dark horror cover or an orange racing cover.
 
 If no `accent` is supplied, do **not** invent or duplicate a separate bottom CTA just to fill space. The fixed swipe cue is the only default lower CTA.
 
@@ -227,7 +236,9 @@ Before returning a cover or multi-cover batch, verify:
 - batch variation changes styling/horizontal placement without changing title height
 - top-tag height does not push the main title down
 - the fixed `佑滑自取` cue is present and centered around ~75% of canvas height
-- the cue uses white text + thick black outline/shadow and a red arrow pointing right
+- the cue colors are **not blindly fixed**; the text and arrow are selected from theme-compatible candidates using the local lower-band background for contrast
+- the arrow points right and remains visually distinct from both its background and the `佑滑自取` text
+- black/white outlines are selected adaptively when needed for readability
 - feature/version cards do not collide with the fixed swipe cue
 - the upper portion of the cover remains available for artwork/background and the small top tag
 - deterministic text rendering is used whenever exact 35% / 75% placement is required
