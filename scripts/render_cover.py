@@ -35,6 +35,7 @@ FONT_CANDIDATES = [
 
 WHITE = (255, 255, 255, 255)
 BLACK = (0, 0, 0, 255)
+RED = (245, 38, 38, 255)
 
 # panel_shape, tag, panel_a, panel_b, accent, shadow, version, stroke,
 # brightness, contrast, saturation
@@ -321,6 +322,58 @@ def draw_features(draw, features, version, font_path, w, h, start_y, theme):
                   stroke_width=stroke, stroke_fill=stroke_color)
 
 
+def draw_swipe_cta(draw, font_path, w, h):
+    """Draw the fixed reference-style '佑滑自取' cue at 75% canvas height."""
+    text = "佑滑自取"
+    center_y = int(h * .75)
+    stroke = max(7, int(w * .010))
+    font = fit_font(draw, [text], font_path, int(w * .46),
+                    int(w * .105), int(w * .070), stroke)
+    tw, th = text_size(draw, text, font, stroke)
+
+    gap = int(w * .035)
+    arrow_len = int(w * .28)
+    total_w = tw + gap + arrow_len
+    x = max(int(w * .05), int((w - total_w) / 2))
+    y = int(center_y - th / 2)
+
+    shadow_offset = max(3, int(w * .004))
+    draw.text((x + shadow_offset, y + shadow_offset), text,
+              font=font, fill=BLACK, stroke_width=stroke + 2, stroke_fill=BLACK)
+    draw.text((x, y), text, font=font, fill=WHITE,
+              stroke_width=stroke, stroke_fill=BLACK)
+
+    arrow_x = x + tw + gap
+    arrow_end = min(w - int(w * .045), arrow_x + arrow_len)
+    arrow_head = max(int(w * .065), int((arrow_end - arrow_x) * .30))
+    arrow_body = max(16, int(h * .018))
+    outline = max(4, int(w * .006))
+    body_top = center_y - arrow_body // 2
+    body_bottom = center_y + arrow_body // 2
+    head_base = arrow_end - arrow_head
+
+    outer = [
+        (arrow_x - outline, body_top - outline),
+        (head_base, body_top - outline),
+        (head_base, center_y - arrow_head // 2 - outline),
+        (arrow_end + outline, center_y),
+        (head_base, center_y + arrow_head // 2 + outline),
+        (head_base, body_bottom + outline),
+        (arrow_x - outline, body_bottom + outline),
+    ]
+    inner = [
+        (arrow_x, body_top),
+        (head_base, body_top),
+        (head_base, center_y - arrow_head // 2),
+        (arrow_end, center_y),
+        (head_base, center_y + arrow_head // 2),
+        (head_base, body_bottom),
+        (arrow_x, body_bottom),
+    ]
+    draw.polygon(outer, fill=BLACK)
+    draw.polygon(inner, fill=RED)
+
+
 def draw_bottom_accent(draw, text, font_path, w, h, theme):
     if not text:
         return
@@ -332,7 +385,7 @@ def draw_bottom_accent(draw, text, font_path, w, h, theme):
     heights = [text_size(draw,line,font,stroke)[1] for line in lines]
     total_h = sum(heights) + max(0,len(lines)-1)*int(h*.008)
     y = h - int(h*.050) - total_h
-    panel_top = max(int(h*.60), y-int(h*.025))
+    panel_top = max(int(h*.82), y-int(h*.025))
     outline = accent if shape == "frame" else None
     draw_panel(draw, (int(w*.02),panel_top,int(w*.98),h-int(h*.025)),
                panel_a, shape, outline, max(2,int(w*.003)))
@@ -369,6 +422,7 @@ def render(input_path, output_path, title, tag, features, version, accent,
                            tag_end + int(h*.025))
     draw_features(draw, features, version, font_path, w, h,
                   title_end + int(h*.025), theme)
+    draw_swipe_cta(draw, font_path, w, h)
     draw_bottom_accent(draw, accent, font_path, w, h, theme)
 
     out = Path(output_path)
@@ -392,7 +446,7 @@ def main():
     ap.add_argument("--feature", action="append", default=[],
                     help="Selling point; repeat up to three times")
     ap.add_argument("--version", default="", help="Version number")
-    ap.add_argument("--accent", default="手游分享", help="Large bottom emphasis")
+    ap.add_argument("--accent", default="", help="Optional large bottom emphasis")
     ap.add_argument("--genre", choices=["auto", *THEMES.keys()], default="auto",
                     help="Genre template; auto checks title/tag/features")
     ap.add_argument("--preset", choices=SIZE_PRESETS.keys(), default=None)
