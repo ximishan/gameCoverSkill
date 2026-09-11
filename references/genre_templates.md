@@ -4,7 +4,7 @@ This file defines the visual families used by `game-cover-maker`. Genre determin
 
 For multi-image requests, also combine these rules with `references/batch_variation.md` and `references/typography_variation.md`. A genre defines a **palette family and design language**, not one fixed color mapping. Do not force every cover in the same genre to use the exact same title color, tag color, feature-card color, or panel arrangement.
 
-**Global title-position rule:** genre styling must never override the fixed title-height rule. Unless the user explicitly requests another height, the main title top anchor stays at approximately **40% of canvas height** (normally about **38–42%** after optical correction) for every genre and every batch member. Genre templates may change title color, shape, panel style, size, and horizontal alignment, but not move the title upward.
+**Global title-position rule:** genre styling must never override the fixed title-height rule. Unless the user explicitly requests another height, the main title layout top anchor is exactly `y = 0.40 × canvas height` for every genre and every batch member. Do not use 38%–42% optical layout corrections. Font glyphs, outlines, and shadows may visually extend a few pixels around the anchor, but genre templates may only change title color, shape, panel style, size, and horizontal alignment—not the vertical coordinate.
 
 ## Action — `action`
 
@@ -12,7 +12,7 @@ Visual family: red/black/yellow/white impact language, rough brush panels, huge 
 
 Allowed text variation: one cover may use white title + yellow accent, another yellow title + black/red panel, another outlined white title with no full panel, another red-white split title. Stay aggressive without copy-pasting the same overlay.
 
-Background: dynamic hero mid-attack, debris/sparks, strong diagonal motion, hard rim light, dark environment, subject centered or lower-right, with a clean readable title band around the **38–55% vertical region** rather than the extreme top.
+Background: dynamic hero mid-attack, debris/sparks, strong diagonal motion, hard rim light, dark environment, subject centered or lower-right, with a clean readable title band around the **38–55% vertical region** while the actual title top anchor stays exactly at 40%.
 
 For known games, preserve the protagonist/enemy silhouette and rendering language rather than creating a generic action hero.
 
@@ -139,7 +139,7 @@ Do not use this exact text recipe on every image. For a four-cover batch, rotate
 
 Useful scenes: home/bedroom/kitchen, town street, school, hospital, restaurant, mall, clothing store, supermarket, playground, multi-location collage.
 
-For batches, change locations and activities while keeping the same character-design and prop language across every image. Keep all main-title top anchors around the same 40% vertical line.
+For batches, change locations and activities while keeping the same character-design and prop language across every image. Keep all main-title layout top anchors at exactly 40% of canvas height.
 
 Best for: life simulation, town role-play, dollhouse, simulator, tycoon, management, city-builder.
 
@@ -185,4 +185,4 @@ Do not automatically attach previous AI-generated covers of the same game as pos
 
 ## Text-layer rule
 
-A genre palette is a set of compatible colors, not a fixed template. For batches, distribute those colors differently across title, tag, features, version/menu badge, and optional accent. See `references/typography_variation.md` for the hard anti-copy-paste rules. The genre template must not override the fixed ~40% main-title top anchor.
+A genre palette is a set of compatible colors, not a fixed template. For batches, distribute those colors differently across title, tag, features, version/menu badge, and optional accent. See `references/typography_variation.md` for the hard anti-copy-paste rules. The genre template must not override the fixed `y = 0.40 × canvas height` main-title top anchor.
