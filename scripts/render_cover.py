@@ -184,10 +184,10 @@ def text_size(draw, text, font, stroke=0):
 def top_safe_layout(w, h):
     ratio = h / max(w, 1)
     if ratio >= 1.55:
-        return 0.09, 0.165
+        return 0.09, 0.40
     if h > w:
-        return 0.06, 0.115
-    return 0.04, 0.085
+        return 0.06, 0.40
+    return 0.04, 0.40
 
 
 def add_readability_layers(img, genre):
